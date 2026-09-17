@@ -31,7 +31,7 @@ export function useHeatPalette(): HeatPalette {
   const { resolved, theme } = useTheme()
   return useMemo(() => {
     const lo = hexToRgb(readToken('--seq-lo') || '#efe9db')
-    const hi = hexToRgb(readToken('--seq-hi') || '#1c4f86')
+    const hi = hexToRgb(readToken('--seq-hi') || '#c23a2a')
     const neg = hexToRgb(readToken('--div-neg') || '#2f6fb5')
     const mid = hexToRgb(readToken('--div-mid') || '#ddd7ca')
     const pos = hexToRgb(readToken('--div-pos') || '#c23a2a')

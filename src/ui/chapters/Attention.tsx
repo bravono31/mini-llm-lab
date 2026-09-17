@@ -306,7 +306,7 @@ export function Attention(_: { onNavigate: (id: string) => void }) {
                 </Arrow>
                 <MatrixMul x={qRow} W={KT} C={hs} OC={T} out={dots} j={kSel} onSelect={setJk} xLabel={`q_${t}（Q の行 ${t}）`} wLabel={`Kᵀ（${hs} 行 × ${T} 列）`} outLabel="q·k" cell={26} rowAxis={`ヘッド ${h + 1} の次元 d`} colAxis="見られる側の位置 t′（列をクリックで切替）" wTag="computed" />
                 <Arrow>↓ ÷ √{hs} = {fmt(Math.sqrt(hs), 3)}</Arrow>
-                <VectorStrip values={scoreRow} cell={44} colLabels={disp} highlight={[kSel]} title={`score[${t}, ·]`} tag="computed" />
+                <VectorStrip values={scoreRow} cell={26} colLabels={disp} highlight={[kSel]} title={`score[${t}, ·]`} tag="computed" />
                 <p className="muted small" style={{ marginTop: 8 }}>
                   これがスコア行列の行 {t} です。同じことを全ての行 t について行うと、下の {T} × {T} の表になります（行 = 見る側の q、列 = 見られる側の k）。
                 </p>

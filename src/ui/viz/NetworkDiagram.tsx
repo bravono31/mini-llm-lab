@@ -52,12 +52,15 @@ function MlpNet({ D, F, L }: { D: number; F: number; L: number }) {
         {edges}
         {cols.map((c, ci) => (
           <g key={ci}>
-            {ys(c.n).map((y, i) => (
-              <circle key={i} cx={c.x} cy={y} r={7} fill={c.color} stroke="var(--paper)" strokeWidth={1.5} opacity={i === Math.floor(c.n / 2) ? 0.35 : 1} />
-            ))}
-            <text x={c.x} y={50 + (Math.floor(c.n / 2) * (h - 150)) / (c.n - 1) + 4} textAnchor="middle" fontSize={11} className="lbl-strong">
-              ⋮
-            </text>
+            {ys(c.n).map((y, i) =>
+              i === Math.floor(c.n / 2) ? (
+                <text key={i} x={c.x} y={y + 4} textAnchor="middle" fontSize={12} className="lbl-strong">
+                  ⋮
+                </text>
+              ) : (
+                <circle key={i} cx={c.x} cy={y} r={7} fill={c.color} stroke="var(--paper)" strokeWidth={1.5} />
+              ),
+            )}
             <text x={c.x} y={h - 70} textAnchor="middle" fontSize={12} className="lbl-strong">
               {c.label}
             </text>
@@ -77,10 +80,10 @@ function MlpNet({ D, F, L }: { D: number; F: number; L: number }) {
           </text>
         ))}
         <text x={w / 2} y={h - 22} textAnchor="middle" fontSize={10}>
-          ノード = 数値 1 つ、線 = 掛ける重み（W₁ は {D}×{F} = {D * F} 本、W₂ は {F}×{D} = {F * D} 本）
+          ノード = 数値 1 つ（⋮ は描ききれない分の省略）、線 = 掛ける重み（W₁ {D}×{F} = {D * F} 本、W₂ {F}×{D} = {F * D} 本）
         </text>
         <text x={w / 2} y={h - 8} textAnchor="middle" fontSize={10}>
-          各ノードは前の層の全ノードの重み付き和（+ バイアス）。ブロックの間にある注意機構と残差接続は省略
+          各ノードは前の層の全ノードの重み付き和（+ バイアス）。ブロックの間の注意機構と残差接続は省略
         </text>
       </svg>
     </div>
