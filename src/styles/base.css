@@ -892,6 +892,15 @@ table.data td.num {
   line-height: 1.6;
 }
 
+.sticky-controls {
+  position: sticky;
+  top: 61px;
+  z-index: 5;
+  background: var(--paper);
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+}
+
 /* ---------- flow diagram (overview) ---------- */
 .flow {
   display: grid;

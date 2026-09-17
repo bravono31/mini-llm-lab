@@ -24,8 +24,16 @@ export function ChapterLayout({ num, title, lede, steps, aside, purpose, io, ter
   const nav = useNav()
   const idx = CHAPTER_META.findIndex((c) => c.id === nav.current)
   const nextChapter = idx >= 0 && idx < CHAPTER_META.length - 1 ? CHAPTER_META[idx + 1] : null
-  const s = useStepper(steps.length, true, nextChapter ? () => nav.go(nextChapter.id) : undefined)
+  const prevChapter = idx > 0 ? CHAPTER_META[idx - 1] : null
+  const s = useStepper(
+    steps.length,
+    true,
+    nextChapter ? () => nav.go(nextChapter.id) : undefined,
+    prevChapter ? () => nav.go(prevChapter.id, 'end') : undefined,
+    nav.entry === 'end' ? steps.length - 1 : 0,
+  )
   const atEnd = s.index >= steps.length - 1
+  const atStart = s.index === 0
   const step = steps[s.index]
   return (
     <>
@@ -81,8 +89,14 @@ export function ChapterLayout({ num, title, lede, steps, aside, purpose, io, ter
         </div>
         <div className="controls">
           <div className="controls-row">
-            <button className="ctl" onClick={s.prev} disabled={s.index === 0} aria-label="前のステップ">
-              ◀
+            <button
+              className="ctl"
+              onClick={s.prev}
+              disabled={atStart && !prevChapter}
+              aria-label={atStart && prevChapter ? `前の章の最後へ：${prevChapter.title}` : '前のステップ'}
+              title={atStart && prevChapter ? `前の章「${prevChapter.title}」の最後へ` : '前のステップ'}
+            >
+              {atStart && prevChapter ? <span style={{ letterSpacing: '-0.25em', marginRight: '0.25em' }}>◀◀</span> : '◀'}
             </button>
             <button
               className={'ctl ' + (atEnd && nextChapter ? 'accent' : 'primary')}
@@ -111,7 +125,7 @@ export function ChapterLayout({ num, title, lede, steps, aside, purpose, io, ter
               <input type="range" min={600} max={4000} step={200} value={5000 - s.interval} onChange={(e) => s.setInterval(5000 - Number(e.target.value))} />
             </label>
             <span className="muted small" style={{ marginLeft: 'auto' }}>
-              {atEnd && nextChapter ? `▶▶ で第 ${nextChapter.num} 章「${nextChapter.title}」へ` : '← → キーでも移動'}
+              {atEnd && nextChapter ? `▶▶ で第 ${nextChapter.num} 章「${nextChapter.title}」へ` : atStart && prevChapter ? `◀◀ で第 ${prevChapter.num} 章「${prevChapter.title}」の最後へ` : '← → キーでも移動'}
             </span>
           </div>
         </div>

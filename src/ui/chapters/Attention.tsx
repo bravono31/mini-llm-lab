@@ -11,7 +11,7 @@ import { Heatmap, VectorStrip } from '../viz/Heatmap'
 import { MatrixMul } from '../viz/MatrixMul'
 import { NetworkDiagram } from '../viz/NetworkDiagram'
 import { TokenChips } from '../viz/TokenChips'
-import { Arrow, Seg } from './controls'
+import { Arrow, Seg, StickyBar } from './controls'
 
 export function Attention(_: { onNavigate: (id: string) => void }) {
   const lab = useLab()
@@ -24,6 +24,7 @@ export function Attention(_: { onNavigate: (id: string) => void }) {
   const [tSel, setT] = useState<number | null>(null)
   const [j, setJ] = useState(0)
   const [jo, setJo] = useState(0)
+  const [jk, setJk] = useState<number | null>(null)
   const t = Math.min(tSel ?? T - 1, T - 1)
   const tokens = tokenizer.tokensOf(ids)
   const disp = tokens.map(displayToken)
@@ -60,6 +61,22 @@ export function Attention(_: { onNavigate: (id: string) => void }) {
   for (let i = 1; i <= t; i++) if (attRow[i] > attRow[topKey]) topKey = i
   let qk = 0
   for (let d = 0; d < hs; d++) qk += Q[t * hs + d] * K[topKey * hs + d]
+  const kSel = Math.min(jk ?? topKey, T - 1)
+  const qRow = Q.subarray(t * hs, (t + 1) * hs)
+  const KT = useMemo(() => {
+    const o = new Float32Array(hs * T)
+    for (let i = 0; i < T; i++) for (let d = 0; d < hs; d++) o[d * T + i] = K[i * hs + d]
+    return o
+  }, [K, T, hs])
+  const dots = useMemo(() => {
+    const o = new Float32Array(T)
+    for (let i = 0; i < T; i++) {
+      let s = 0
+      for (let d = 0; d < hs; d++) s += Q[t * hs + d] * K[i * hs + d]
+      o[i] = s
+    }
+    return o
+  }, [Q, K, t, T, hs])
 
   const colGroups = [
     { label: 'Q', from: 0, to: D, color: 'var(--q)' },
@@ -68,12 +85,14 @@ export function Attention(_: { onNavigate: (id: string) => void }) {
   ]
 
   const controls = (
-    <div className="row" style={{ alignItems: 'center', gap: 18, marginBottom: 18 }}>
-      <Seg label="層" value={l} options={Array.from({ length: L }, (_, i) => ({ value: i, label: `${i + 1}` }))} onChange={setL} />
-      <Seg label="ヘッド" value={h} options={Array.from({ length: H }, (_, i) => ({ value: i, label: `${i + 1}` }))} onChange={setH} />
-      <span className="field">注目トークン（クエリ）</span>
-      <TokenChips tokens={tokens} active={t} onSelect={setT} positions />
-    </div>
+    <StickyBar>
+      <div className="row" style={{ alignItems: 'center', gap: 18 }}>
+        <Seg label="層" value={l} options={Array.from({ length: L }, (_, i) => ({ value: i, label: `${i + 1}` }))} onChange={setL} />
+        <Seg label="ヘッド" value={h} options={Array.from({ length: H }, (_, i) => ({ value: i, label: `${i + 1}` }))} onChange={setH} />
+        <span className="field">注目トークン（クエリ）</span>
+        <TokenChips tokens={tokens} active={t} onSelect={setT} positions />
+      </div>
+    </StickyBar>
   )
   const controlsHelp = (
     <p className="controls-help">
@@ -115,6 +134,9 @@ export function Attention(_: { onNavigate: (id: string) => void }) {
           </p>
           <p>
             <strong>なぜヘッドに分けるのか</strong>：1 つの注意は、位置ごとに 1 通りの「誰をどれだけ見るか」しか決められません。しかし「直前の語」「文の主語」「同じ語の前回の出現」のように、同時に見たい関係は複数あります。そこで {D} 次元を {H} 組に分け、組ごとに独立した Q・K・V で別々の関係を測ります。計算量は分けても増えず、表現できる関係の種類が増えるのが利点です。
+          </p>
+          <p>
+            <strong>式の b はバイアス</strong>（偏り）です。直線 y = ax + b の b と同じで、入力がすべて 0 でも出力を b だけずらせる定数。掛け算 x·W だけでは出力の基準点を動かせないので、出力 {3 * D} 個それぞれに 1 個ずつ持たせ、W と一緒に学習で決めます。
           </p>
         </>
       ),
@@ -269,13 +291,35 @@ export function Attention(_: { onNavigate: (id: string) => void }) {
               </div>
             </>
           )}
-          {step.id === 'scores' && scoresHeat(false)}
+          {step.id === 'scores' && (
+            <>
+              <div className="card">
+                <div className="card-title">
+                  スコアの作り方：位置 {t}「{disp[t]}」の q と、各位置の k との内積（ヘッド {h + 1}）
+                </div>
+                <div className="row" style={{ gap: 28 }}>
+                  <Heatmap values={Q} rows={T} cols={hs} cell={22} rowLabels={disp} colLabels={hsLabels} rowLabelWidth={60} highlightRows={[t]} showValues title="Q（全位置の q）" tag="computed" rowAxis="位置 t（見る側）" colAxis={`ヘッド ${h + 1} の次元 d`} />
+                  <Heatmap values={K} rows={T} cols={hs} cell={22} rowLabels={disp} colLabels={hsLabels} rowLabelWidth={60} highlightRows={[kSel]} showValues title="K（全位置の k）" tag="computed" rowAxis="位置 t′（見られる側）" colAxis={`ヘッド ${h + 1} の次元 d`} onRowClick={setJk} />
+                </div>
+                <Arrow>
+                  ↓ Q の行 {t} を取り出し、K を転置した行列（{hs} 行 × {T} 列。列 t′ が k<sub>t′</sub>）に掛けると、全位置との内積が一度に出ます
+                </Arrow>
+                <MatrixMul x={qRow} W={KT} C={hs} OC={T} out={dots} j={kSel} onSelect={setJk} xLabel={`q_${t}（Q の行 ${t}）`} wLabel={`Kᵀ（${hs} 行 × ${T} 列）`} outLabel="q·k" cell={26} rowAxis={`ヘッド ${h + 1} の次元 d`} colAxis="見られる側の位置 t′（列をクリックで切替）" wTag="computed" />
+                <Arrow>↓ ÷ √{hs} = {fmt(Math.sqrt(hs), 3)}</Arrow>
+                <VectorStrip values={scoreRow} cell={44} colLabels={disp} highlight={[kSel]} title={`score[${t}, ·]`} tag="computed" />
+                <p className="muted small" style={{ marginTop: 8 }}>
+                  これがスコア行列の行 {t} です。同じことを全ての行 t について行うと、下の {T} × {T} の表になります（行 = 見る側の q、列 = 見られる側の k）。
+                </p>
+              </div>
+              {scoresHeat(false)}
+            </>
+          )}
           {step.id === 'mask' && (
             <>
               {scoresHeat(true)}
               <div className="card">
                 <div className="card-title">1 回の forward で、全位置の「次トークン」の確率が同時に出る</div>
-                <Heatmap values={acts.probs} rows={T} cols={params.config.vocabSize} cell={Math.max(4, Math.min(8, Math.floor(560 / params.config.vocabSize)))} gap={0} mode="sequential" max={1} rowLabels={disp.map((d, i) => `${i} ${d}`)} rowLabelWidth={70} tag="computed" rowAxis="位置 t（その位置までを見て「次」を予測）" colAxis="語彙の各トークン（濃いほど高確率）" legend />
+                <Heatmap values={acts.probs} rows={T} cols={params.config.vocabSize} cell={Math.max(4, Math.min(8, Math.floor(560 / params.config.vocabSize)))} cellH={18} gap={0} mode="sequential" max={1} rowLabels={disp.map((d, i) => `${i} ${d}`)} rowLabelWidth={70} tag="computed" rowAxis="位置 t（その位置までを見て「次」を予測）" colAxis="語彙の各トークン（濃いほど高確率）" legend />
                 <p className="muted small" style={{ marginTop: 8 }}>
                   マスクのおかげで行 t は位置 t までしか見ていないので、{T} 行すべてが「そこまで読んだ時点の予測」として同時に使えます。第 06 章の最後のステップに、行ごとの予測の表があります。
                 </p>

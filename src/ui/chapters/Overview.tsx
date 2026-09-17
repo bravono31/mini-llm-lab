@@ -135,7 +135,7 @@ export function Overview({ onNavigate }: ChapterProps) {
       body: (
         <>
           <p>
-            <Term id="transformer">Transformer</Term> も、ノード（数値）を線（重み）でつないだ<strong>ニューラルネットワーク</strong>です。左の図は <Term id="mlp">MLP</Term> をそのまま描いたもので、入力 {cfg.dModel} → 中間層 {cfg.dFF} → 出力 {cfg.dModel} の 3 層ネットワークそのものです。線 1 本が重み 1 個に対応します。
+            <Term id="transformer">Transformer</Term> も、ノード（数値）を線（重み）でつないだ<strong>ニューラルネットワーク</strong>です。左の図は各ブロックの <Term id="mlp">MLP</Term> をそのまま描いたもので、入力 {cfg.dModel} → 中間層 {cfg.dFF} → 出力 {cfg.dModel} の 3 層ネットワークが、ブロックの数だけ（{cfg.nLayers} 回）つながっています。ブロック 1 の出力がブロック 2 の入力です。線 1 本が重み 1 個に対応します。
           </p>
           <p>
             右の図は全体です。注意機構と MLP を組にした「ブロック」を、一般のネットワークで中間層を積むのと同じように {cfg.nLayers} 段重ねています。各章の「層」の切替は、この段のどれを見るかの選択です。

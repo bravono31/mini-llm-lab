@@ -16,6 +16,11 @@ export function Seg<T extends string | number>({ label, value, options, onChange
   )
 }
 
+/** Chapter-level selectors that stay visible while the stage scrolls. */
+export function StickyBar({ children }: { children: ReactNode }) {
+  return <div className="sticky-controls">{children}</div>
+}
+
 export function Arrow({ children }: { children: ReactNode }) {
   return (
     <div className="muted" style={{ margin: '6px 0 6px 4px' }}>

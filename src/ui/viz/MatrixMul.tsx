@@ -1,5 +1,6 @@
 import { fmt } from './colors'
 import { Heatmap, VectorStrip, type ColGroup } from './Heatmap'
+import type { ValueKind } from './Tag'
 
 interface Props {
   x: ArrayLike<number>
@@ -18,10 +19,12 @@ interface Props {
   /** what an input dimension i / output column j means */
   rowAxis?: string
   colAxis?: string
+  /** where W's numbers come from (a learned matrix by default) */
+  wTag?: ValueKind
 }
 
 /** x (1×C) · W (C×OC) + b = out (1×OC), with output column j spelled out. */
-export function MatrixMul({ x, W, C, OC, bias, out, j, onSelect, xLabel, wLabel, outLabel, colGroups, cell = 11, rowAxis, colAxis }: Props) {
+export function MatrixMul({ x, W, C, OC, bias, out, j, onSelect, xLabel, wLabel, outLabel, colGroups, cell = 11, rowAxis, colAxis, wTag = 'param' }: Props) {
   const terms: string[] = []
   let sum = 0
   for (let i = 0; i < C; i++) {
@@ -41,7 +44,7 @@ export function MatrixMul({ x, W, C, OC, bias, out, j, onSelect, xLabel, wLabel,
           ×
         </div>
         <div>
-          <Heatmap values={W} rows={C} cols={OC} cell={cell} title={wLabel} tag="param" legend highlightCols={[j]} colLabels={OC <= 64 ? colLabels : undefined} colGroups={colGroups} onCellClick={(_, c) => onSelect(c)} rowName="i" colName="j" rowAxis={rowAxis ?? '入力の次元 i（x の何番目に掛かるか）'} colAxis={colAxis ?? '出力の次元 j（どの出力を作るか）'} />
+          <Heatmap values={W} rows={C} cols={OC} cell={cell} title={wLabel} tag={wTag} legend highlightCols={[j]} colLabels={OC <= 64 ? colLabels : undefined} colGroups={colGroups} onCellClick={(_, c) => onSelect(c)} rowName="i" colName="j" rowAxis={rowAxis ?? '入力の次元 i（x の何番目に掛かるか）'} colAxis={colAxis ?? '出力の次元 j（どの出力を作るか）'} />
           <div className="muted small" style={{ marginTop: 6 }}>
             セルの色 = 重みの値（藍が負、朱が正）。{colGroups ? '上の帯 = その列が作る出力の種類。' : ''}列をクリックすると下の式が変わります。
           </div>
@@ -60,6 +63,11 @@ export function MatrixMul({ x, W, C, OC, bias, out, j, onSelect, xLabel, wLabel,
         {'\n'}= {terms.join(' + ')} + …{bias ? ` + ${fmt(b)}` : ''}
         {'\n'}= {fmt(sum + b, 4)}
       </div>
+      {bias && (
+        <p className="muted small" style={{ marginTop: -6 }}>
+          b[{j}] は<strong>バイアス</strong>（偏り）。直線 y = ax + b の b と同じで、入力 x が全部 0 でも出力を b[{j}] だけずらせる定数です。掛け算だけでは出力の「基準点」を動かせないので、出力 1 つにつき 1 個ずつ持たせ、重みと一緒に学習で決めます。
+        </p>
+      )}
     </div>
   )
 }

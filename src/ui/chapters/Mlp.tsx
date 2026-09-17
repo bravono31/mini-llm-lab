@@ -11,7 +11,7 @@ import { Heatmap, VectorStrip } from '../viz/Heatmap'
 import { MatrixMul } from '../viz/MatrixMul'
 import { NetworkDiagram } from '../viz/NetworkDiagram'
 import { TokenChips } from '../viz/TokenChips'
-import { Arrow, Seg } from './controls'
+import { Arrow, Seg, StickyBar } from './controls'
 
 function GeluCurve({ pre }: { pre: ArrayLike<number> }) {
   const w = 360
@@ -84,11 +84,13 @@ export function Mlp(_: { onNavigate: (id: string) => void }) {
   const norm = (v: ArrayLike<number>) => Math.sqrt(Array.from(v).reduce((s, x) => s + x * x, 0))
 
   const controls = (
-    <div className="row" style={{ alignItems: 'center', gap: 18, marginBottom: 18 }}>
-      <Seg label="層" value={l} options={Array.from({ length: L }, (_, i) => ({ value: i, label: `${i + 1}` }))} onChange={setL} />
-      <span className="field">トークン</span>
-      <TokenChips tokens={tokens} active={t} onSelect={setT} positions />
-    </div>
+    <StickyBar>
+      <div className="row" style={{ alignItems: 'center', gap: 18 }}>
+        <Seg label="層" value={l} options={Array.from({ length: L }, (_, i) => ({ value: i, label: `${i + 1}` }))} onChange={setL} />
+        <span className="field">トークン</span>
+        <TokenChips tokens={tokens} active={t} onSelect={setT} positions />
+      </div>
+    </StickyBar>
   )
 
   const steps: Step[] = [

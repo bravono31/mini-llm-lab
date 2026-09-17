@@ -12,21 +12,29 @@ export function NetworkDiagram({ panel = 'both' }: Props) {
   const T = ids.length
   return (
     <div className="row" style={{ gap: 28, alignItems: 'flex-start' }}>
-      {(panel === 'mlp' || panel === 'both') && <MlpNet D={D} F={F} />}
+      {(panel === 'mlp' || panel === 'both') && <MlpNet D={D} F={F} L={L} />}
       {(panel === 'stack' || panel === 'both') && <Stack L={L} H={H} D={D} T={T} V={V} />}
     </div>
   )
 }
 
-function MlpNet({ D, F }: { D: number; F: number }) {
-  const w = 420
-  const h = 300
-  const cols = [
-    { x: 60, n: 7, label: `入力 ${D} 次元`, sub: 'LN₂(x₁) のベクトル', color: 'var(--indigo)' },
-    { x: 210, n: 10, label: `中間層 ${F} 個`, sub: 'GELU で発火 / 沈黙', color: 'var(--accent)' },
-    { x: 360, n: 7, label: `出力 ${D} 次元`, sub: '残差に足し戻す', color: 'var(--indigo)' },
-  ]
-  const ys = (n: number) => Array.from({ length: n }, (_, i) => 50 + (i * (h - 130)) / (n - 1))
+function MlpNet({ D, F, L }: { D: number; F: number; L: number }) {
+  const dx = 120
+  const h = 324
+  type Col = { x: number; n: number; label: string; sub: string; sub2?: string; color: string }
+  const cols: Col[] = []
+  for (let l = 0; l < L; l++) {
+    cols.push(
+      l === 0
+        ? { x: 0, n: 7, label: `入力 ${D} 次元`, sub: 'LN₂(x₁) のベクトル', color: 'var(--indigo)' }
+        : { x: 0, n: 7, label: `${D} 次元`, sub: `ブロック ${l} の出力`, sub2: `= ブロック ${l + 1} の入力`, color: 'var(--indigo)' },
+      { x: 0, n: 10, label: `中間層 ${F} 個`, sub: 'GELU で発火 / 沈黙', color: 'var(--accent)' },
+    )
+  }
+  cols.push({ x: 0, n: 7, label: `出力 ${D} 次元`, sub: '残差に足し戻す', color: 'var(--indigo)' })
+  cols.forEach((c, i) => (c.x = 60 + i * dx))
+  const w = 120 + (cols.length - 1) * dx
+  const ys = (n: number) => Array.from({ length: n }, (_, i) => 50 + (i * (h - 150)) / (n - 1))
   const edges: ReactElement[] = []
   for (let c = 0; c < cols.length - 1; c++) {
     const a = ys(cols[c].n)
@@ -39,7 +47,7 @@ function MlpNet({ D, F }: { D: number; F: number }) {
   }
   return (
     <div className="viz-wrap">
-      <div className="viz-title">MLP そのものが、教科書どおりの 3 層ニューラルネットワーク</div>
+      <div className="viz-title">MLP 1 つは教科書どおりの 3 層ニューラルネットワーク。それがブロック {L} 段分つながる</div>
       <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} style={{ display: 'block', maxWidth: '100%', height: 'auto' }}>
         {edges}
         {cols.map((c, ci) => (
@@ -47,25 +55,32 @@ function MlpNet({ D, F }: { D: number; F: number }) {
             {ys(c.n).map((y, i) => (
               <circle key={i} cx={c.x} cy={y} r={7} fill={c.color} stroke="var(--paper)" strokeWidth={1.5} opacity={i === Math.floor(c.n / 2) ? 0.35 : 1} />
             ))}
-            <text x={c.x} y={50 + (Math.floor(c.n / 2) * (h - 130)) / (c.n - 1) + 4} textAnchor="middle" fontSize={11} className="lbl-strong">
+            <text x={c.x} y={50 + (Math.floor(c.n / 2) * (h - 150)) / (c.n - 1) + 4} textAnchor="middle" fontSize={11} className="lbl-strong">
               ⋮
             </text>
-            <text x={c.x} y={h - 52} textAnchor="middle" fontSize={12} className="lbl-strong">
+            <text x={c.x} y={h - 70} textAnchor="middle" fontSize={12} className="lbl-strong">
               {c.label}
             </text>
-            <text x={c.x} y={h - 36} textAnchor="middle" fontSize={10}>
+            <text x={c.x} y={h - 54} textAnchor="middle" fontSize={10}>
               {c.sub}
             </text>
+            {c.sub2 && (
+              <text x={c.x} y={h - 40} textAnchor="middle" fontSize={10}>
+                {c.sub2}
+              </text>
+            )}
           </g>
         ))}
-        <text x={135} y={22} textAnchor="middle" fontSize={10}>
-          W₁：線 1 本 = 重み 1 個（{D}×{F} = {D * F} 本）
+        {Array.from({ length: L }, (_, l) => (
+          <text key={l} x={cols[2 * l + 1].x} y={22} textAnchor="middle" fontSize={10} fill="var(--accent)">
+            ブロック {l + 1} の MLP（W₁ · W₂）
+          </text>
+        ))}
+        <text x={w / 2} y={h - 22} textAnchor="middle" fontSize={10}>
+          ノード = 数値 1 つ、線 = 掛ける重み（W₁ は {D}×{F} = {D * F} 本、W₂ は {F}×{D} = {F * D} 本）
         </text>
-        <text x={285} y={22} textAnchor="middle" fontSize={10}>
-          W₂：{F}×{D} = {F * D} 本
-        </text>
-        <text x={w / 2} y={h - 10} textAnchor="middle" fontSize={10}>
-          ノード = 数値 1 つ、線 = 掛ける重み。各ノードは前の層の全ノードから重み付きで集めた和（+ バイアス）
+        <text x={w / 2} y={h - 8} textAnchor="middle" fontSize={10}>
+          各ノードは前の層の全ノードの重み付き和（+ バイアス）。ブロックの間にある注意機構と残差接続は省略
         </text>
       </svg>
     </div>

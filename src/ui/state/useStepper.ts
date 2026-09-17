@@ -26,8 +26,8 @@ function isTypingTarget(el: EventTarget | null): boolean {
   return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || el.isContentEditable
 }
 
-export function useStepper(count: number, keyboard = true, onOverflow?: () => void): Stepper {
-  const [index, setIndexState] = useState(0)
+export function useStepper(count: number, keyboard = true, onOverflow?: () => void, onUnderflow?: () => void, initial = 0): Stepper {
+  const [index, setIndexState] = useState(() => Math.max(0, Math.min(count - 1, initial)))
   const [playing, setPlaying] = useState(false)
   const [interval, setIntervalMs] = useState(1800)
   const indexRef = useRef(index)
@@ -43,7 +43,15 @@ export function useStepper(count: number, keyboard = true, onOverflow?: () => vo
     indexRef.current = i + 1
     setIndexState(i + 1)
   }, [count, onOverflow])
-  const prev = useCallback(() => setIndexState((i) => Math.max(0, i - 1)), [])
+  const prev = useCallback(() => {
+    const i = indexRef.current
+    if (i <= 0) {
+      onUnderflow?.()
+      return
+    }
+    indexRef.current = i - 1
+    setIndexState(i - 1)
+  }, [onUnderflow])
   const togglePlay = useCallback(() => {
     setPlaying((p) => {
       if (!p && index >= count - 1) setIndexState(0)

@@ -15,6 +15,8 @@ export interface HeatmapProps {
   cols: number
   mode?: 'diverging' | 'sequential'
   cell?: number
+  /** row height when cells should not be square */
+  cellH?: number
   gap?: number
   rowLabels?: string[]
   colLabels?: string[]
@@ -50,6 +52,7 @@ export function Heatmap(p: HeatmapProps) {
   const { rows, cols, values } = p
   const mode = p.mode ?? 'diverging'
   const cell = p.cell ?? 14
+  const ch = p.cellH ?? cell
   const gap = p.gap ?? 1
   const digits = p.digits ?? 2
   const rlw = p.rowLabelWidth ?? (p.rowLabels ? 52 : 0)
@@ -76,9 +79,10 @@ export function Heatmap(p: HeatmapProps) {
   const anyHighlight = hr.size > 0 || hc.size > 0 || hcell.size > 0
 
   const width = rlw + cols * (cell + gap) + 2
-  const height = clh + rows * (cell + gap) + 2
+  const height = clh + rows * (ch + gap) + 2
   const step = cell + gap
-  const fontSize = Math.min(10, Math.max(7, cell * 0.42))
+  const stepY = ch + gap
+  const fontSize = Math.min(10, Math.max(7, Math.min(cell, ch) * 0.42))
 
   const rects = []
   for (let r = 0; r < rows; r++) {
@@ -91,14 +95,14 @@ export function Heatmap(p: HeatmapProps) {
       const inRowOrCol = hr.has(r) || hc.has(c)
       const dim = p.dimOthers && anyHighlight && !strong && !inRowOrCol
       const x = rlw + c * step + 1
-      const y = clh + r * step + 1
+      const y = clh + r * stepY + 1
       rects.push(
         <g key={r * cols + c} opacity={dim ? 0.22 : 1}>
           <rect
             x={x}
             y={y}
             width={cell}
-            height={cell}
+            height={ch}
             fill={fill}
             rx={cell >= 12 ? 1.5 : 0}
             stroke={strong ? 'var(--accent)' : hover && hover.r === r && hover.c === c ? 'var(--ink)' : 'none'}
@@ -109,7 +113,7 @@ export function Heatmap(p: HeatmapProps) {
             style={{ cursor: p.onCellClick || p.onRowClick ? 'pointer' : 'default', transition: 'fill 200ms' }}
           />
           {p.showValues && cell >= 18 && !masked && (
-            <text x={x + cell / 2} y={y + cell / 2 + fontSize * 0.36} textAnchor="middle" fontSize={fontSize} fill={Math.abs(t) > 0.55 ? 'var(--paper)' : 'var(--ink)'} pointerEvents="none">
+            <text x={x + cell / 2} y={y + ch / 2 + fontSize * 0.36} textAnchor="middle" fontSize={fontSize} fill={Math.abs(t) > 0.55 ? 'var(--paper)' : 'var(--ink)'} pointerEvents="none">
               {fmt(v, digits)}
             </text>
           )}
@@ -176,9 +180,9 @@ export function Heatmap(p: HeatmapProps) {
           <text
             key={r}
             x={rlw - 6}
-            y={clh + r * step + cell / 2 + 3.5}
+            y={clh + r * stepY + ch / 2 + 3.5}
             textAnchor="end"
-            fontSize={Math.min(11, Math.max(8, cell * 0.7))}
+            fontSize={Math.min(11, Math.max(8, ch * 0.7))}
             className={hr.has(r) ? 'lbl-strong' : ''}
             style={{ cursor: p.onRowClick ? 'pointer' : 'default' }}
             onClick={() => p.onRowClick?.(r)}
@@ -188,14 +192,14 @@ export function Heatmap(p: HeatmapProps) {
         ))}
         {rects}
         {[...hr].map((r) => (
-          <rect key={'r' + r} x={rlw + 0.5} y={clh + r * step + 0.5} width={cols * step - gap + 1} height={cell + 1} fill="none" stroke="var(--accent)" strokeWidth={1.5} pointerEvents="none" />
+          <rect key={'r' + r} x={rlw + 0.5} y={clh + r * stepY + 0.5} width={cols * step - gap + 1} height={ch + 1} fill="none" stroke="var(--accent)" strokeWidth={1.5} pointerEvents="none" />
         ))}
         {[...hc].map((c) => (
-          <rect key={'c' + c} x={rlw + c * step + 0.5} y={clh + 0.5} width={cell + 1} height={rows * step - gap + 1} fill="none" stroke="var(--accent)" strokeWidth={1.5} pointerEvents="none" />
+          <rect key={'c' + c} x={rlw + c * step + 0.5} y={clh + 0.5} width={cell + 1} height={rows * stepY - gap + 1} fill="none" stroke="var(--accent)" strokeWidth={1.5} pointerEvents="none" />
         ))}
       </svg>
       {hover && tip && (
-        <div className="tooltip" style={{ left: rlw + hover.c * step + cell / 2 + 1, top: clh + hover.r * step + 1 }}>
+        <div className="tooltip" style={{ left: rlw + hover.c * step + cell / 2 + 1, top: clh + hover.r * stepY + 1 }}>
           {tip}
         </div>
       )}

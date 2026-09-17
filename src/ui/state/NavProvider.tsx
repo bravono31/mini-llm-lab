@@ -7,10 +7,14 @@ export interface ReturnTo {
   anchor?: string
 }
 
+export type Entry = 'start' | 'end'
+
 interface Nav {
   current: string
+  /** which step the current chapter should open on */
+  entry: Entry
   /** plain navigation (clears any "return to" state) */
-  go: (id: string) => void
+  go: (id: string, entry?: Entry) => void
   /** navigate from a glossary link: remembers where we came from */
   goFrom: (to: string, anchor?: string) => void
   returnTo: ReturnTo | null
@@ -27,23 +31,28 @@ function readHash(): string {
 export function NavProvider({ children }: { children: ReactNode }) {
   const [current, setCurrent] = useState(readHash)
   const [returnTo, setReturnTo] = useState<ReturnTo | null>(null)
+  const [entry, setEntry] = useState<Entry>('start')
 
   useEffect(() => {
-    const on = () => setCurrent(readHash())
+    const on = () => {
+      setCurrent(readHash())
+      setEntry('start')
+    }
     window.addEventListener('hashchange', on)
     return () => window.removeEventListener('hashchange', on)
   }, [])
 
-  const jump = useCallback((id: string) => {
+  const jump = useCallback((id: string, e: Entry = 'start') => {
+    setEntry(e)
     location.hash = id
     setCurrent(id)
     window.scrollTo({ top: 0 })
   }, [])
 
   const go = useCallback(
-    (id: string) => {
+    (id: string, e?: Entry) => {
       setReturnTo(null)
-      jump(id)
+      jump(id, e)
     },
     [jump],
   )
@@ -65,7 +74,7 @@ export function NavProvider({ children }: { children: ReactNode }) {
     if (anchor) requestAnimationFrame(() => document.getElementById(anchor)?.scrollIntoView({ block: 'center' }))
   }, [returnTo, jump])
 
-  const value = useMemo(() => ({ current, go, goFrom, returnTo, back }), [current, go, goFrom, returnTo, back])
+  const value = useMemo(() => ({ current, entry, go, goFrom, returnTo, back }), [current, entry, go, goFrom, returnTo, back])
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>
 }
 
