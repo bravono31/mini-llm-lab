@@ -120,6 +120,12 @@ export function Overview({ onNavigate }: ChapterProps) {
             大事なのは<strong>形</strong>です。文字列 → 整数の列 → 行列（T × 16）→ …と形が変わり、行列になってからは <Term id="attention">注意機構</Term>と <Term id="mlp">MLP</Term> が同じ形のまま中身を書き換えていきます。
           </p>
           <p>各段の「なぜ」を読めば、次の章以降で見る計算が何のためのものか分かります。段をクリックすると章へ移動します。</p>
+          <p>
+            <strong>読む順番について。</strong>実際の LLM は、まず大量の文章で<strong>学習</strong>して重みを決め、そのあとで<strong>生成</strong>に使います。このアプリはあえて逆順で、生成（推論：第 02〜06 章）を先に、学習（第 07 章）を後に置いています。学習の 1 <Term id="step">ステップ</Term>は「生成と同じ計算を 1 回流し、答え合わせをして、重みを少し直す」ことの繰り返しなので、生成側の計算を知らないと学習の章が読めないからです。第 02〜06 章の数値は、同梱の学習済み重み（第 07 章の学習を {lab.pretrained.trainSteps.toLocaleString()} ステップ済ませたもの）で計算しています。
+          </p>
+          <p>
+            なお第 07 章の「学習」は、実際の LLM で言う<Term id="pretrain">事前学習</Term>（次のトークンを当てる学習）そのものです。ChatGPT のような対話モデルはこの後に、指示に従わせるための追加の学習（事後学習）を重ねますが、このアプリでは扱いません。
+          </p>
         </>
       ),
     },
@@ -187,7 +193,7 @@ export function Overview({ onNavigate }: ChapterProps) {
       title="概要"
       lede="入力文が次の一語に変わるまでの道のりを、実際の値で並べました。"
       steps={steps}
-      terms={['llm', 'transformer', 'gpt', 'parameter', 'layer', 'token', 'vector', 'attention', 'mlp', 'residual', 'probability', 'forward', 'context', 'step']}
+      terms={['llm', 'transformer', 'gpt', 'parameter', 'layer', 'token', 'vector', 'attention', 'mlp', 'residual', 'probability', 'forward', 'context', 'step', 'pretrain']}
     >
       {(step) => {
         if (step.id === 'flow')

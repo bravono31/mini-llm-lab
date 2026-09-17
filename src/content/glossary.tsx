@@ -48,6 +48,7 @@ export const GLOSSARY: Record<string, GlossaryEntry> = {
   lr: { term: '学習率', short: '1 回の更新でパラメータをどれだけ動かすかの倍率。大きすぎると発散、小さすぎると遅い。', chapter: 'train' },
   batch: { term: 'バッチ', short: '1 回の更新に使う例のまとまり。ここでは 16 本の長さ 16 の列。', chapter: 'train' },
   step: { term: 'ステップ', short: 'forward → 損失 → 逆伝播 → 更新 の 1 回。同梱の学習済み重みは 3000 ステップ。', chapter: 'train' },
+  pretrain: { term: '事前学習（pretraining）', short: '大量の文章で「次のトークンを当てる」ように重みを決める、LLM の最初の学習段階。第 07 章の学習はこれそのもの。ChatGPT のような対話モデルはこの後に指示に従わせる追加の学習（事後学習：fine-tuning / RLHF）を重ねるが、このアプリでは扱わない。', chapter: 'train' },
   context: { term: '文脈長（context length）', short: 'モデルが一度に見られるトークン数。このモデルは 16。超えた分は捨てる。', chapter: 'overview' },
   forward: { term: 'forward（順伝播）', short: '入力のトークン列から出力の確率分布まで、第 03〜06 章の計算を一通り流すこと。生成では 1 トークン出すたびに 1 回、学習では 1 ステップに 1 回行う。逆向きに勾配を流すのが backward（逆伝播）。', chapter: 'overview' },
   pca: { term: 'PCA（主成分分析）', short: '高次元のデータを、ばらつきが最も大きい方向に沿って 2 次元に射影する方法。見るためだけの道具でモデルには無関係。', chapter: 'embed' },

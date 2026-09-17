@@ -262,7 +262,7 @@ export function Train(_: { onNavigate: (id: string) => void }) {
         </>
       }
       io="バッチ（入力と正解）→ 損失 → 勾配 → 更新された重み"
-      terms={['loss', 'gradient', 'backprop', 'adamw', 'lr', 'batch', 'step', 'parameter', 'forward']}
+      terms={['loss', 'gradient', 'backprop', 'adamw', 'lr', 'batch', 'step', 'parameter', 'forward', 'pretrain']}
       steps={steps}
       aside={resetButtons}
     >
