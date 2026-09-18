@@ -35,15 +35,19 @@ function MlpNet({ D, F, L }: { D: number; F: number; L: number }) {
   cols.forEach((c, i) => (c.x = 60 + i * dx))
   const w = 120 + (cols.length - 1) * dx
   const ys = (n: number) => Array.from({ length: n }, (_, i) => 50 + (i * (h - 150)) / (n - 1))
+  /** the slot drawn as ⋮ stands for the omitted nodes, so nothing connects to it */
+  const ellipsis = (n: number) => Math.floor(n / 2)
   const edges: ReactElement[] = []
   for (let c = 0; c < cols.length - 1; c++) {
     const a = ys(cols[c].n)
     const b = ys(cols[c + 1].n)
-    a.forEach((y1, i) =>
+    a.forEach((y1, i) => {
+      if (i === ellipsis(cols[c].n)) return
       b.forEach((y2, j) => {
+        if (j === ellipsis(cols[c + 1].n)) return
         edges.push(<line key={`${c}-${i}-${j}`} x1={cols[c].x} y1={y1} x2={cols[c + 1].x} y2={y2} stroke="var(--line-2)" strokeWidth={0.6} opacity={0.7} />)
-      }),
-    )
+      })
+    })
   }
   return (
     <div className="viz-wrap">
