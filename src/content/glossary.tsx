@@ -52,6 +52,9 @@ export const GLOSSARY: Record<string, GlossaryEntry> = {
   context: { term: '文脈長（context length）', short: 'モデルが一度に見られるトークン数。このモデルは 16。超えた分は捨てる。', chapter: 'overview' },
   forward: { term: 'forward（順伝播）', short: '入力のトークン列から出力の確率分布まで、第 03〜06 章の計算を一通り流すこと。生成では 1 トークン出すたびに 1 回、学習では 1 ステップに 1 回行う。逆向きに勾配を流すのが backward（逆伝播）。', chapter: 'overview' },
   pca: { term: 'PCA（主成分分析）', short: '高次元のデータを、ばらつきが最も大きい方向に沿って 2 次元に射影する方法。見るためだけの道具でモデルには無関係。', chapter: 'embed' },
+  rag: { term: 'RAG（検索拡張生成）', short: 'Retrieval-Augmented Generation。質問に関係する文書を検索し、プロンプトに書き足してから生成させる仕組み。重みを変えずに、モデルが学習していない知識を使わせられる。', chapter: 'rag' },
+  tfidf: { term: 'TF-IDF', short: 'トークンの出現回数（TF）に、そのトークンの珍しさ（IDF）を掛けた重み。どの文書にも出る語を軽く、特定の文書にしか出ない語を重く扱う、古典的な検索の手法。', chapter: 'rag' },
+  cosine: { term: 'コサイン類似度', short: '2 本のベクトルのなす角の cos。向きが同じなら 1、直交（共通の成分なし）なら 0。ベクトルの長さに左右されないので、文書の近さを測るのによく使う。', chapter: 'rag' },
 }
 
 /** Inline term: dotted underline, hover for a definition, click to jump to the glossary at the page bottom. */
@@ -104,6 +107,6 @@ export function GlossaryList({ ids, current }: { ids: string[]; current: string 
 }
 
 function chapterName(id: string): string {
-  const names: Record<string, string> = { overview: '第 01 章', tokenize: '第 02 章', embed: '第 03 章', attention: '第 04 章', mlp: '第 05 章', output: '第 06 章', train: '第 07 章', params: '第 08 章' }
+  const names: Record<string, string> = { overview: '第 01 章', tokenize: '第 02 章', embed: '第 03 章', attention: '第 04 章', mlp: '第 05 章', output: '第 06 章', train: '第 07 章', params: '第 08 章', rag: '第 09 章' }
   return names[id] ?? id
 }

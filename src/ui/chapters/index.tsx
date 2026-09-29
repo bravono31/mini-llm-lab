@@ -5,6 +5,7 @@ import { Embed } from './Embed'
 import { Mlp } from './Mlp'
 import { Output } from './Output'
 import { Params } from './Params'
+import { Rag } from './Rag'
 import { Train } from './Train'
 import { Overview } from './Overview'
 import { Tokenize } from './Tokenize'
@@ -20,6 +21,6 @@ export interface ChapterDef {
   component: ComponentType<ChapterProps>
 }
 
-const COMPONENTS: Record<string, ComponentType<ChapterProps>> = { overview: Overview, tokenize: Tokenize, embed: Embed, attention: Attention, mlp: Mlp, output: Output, train: Train, params: Params }
+const COMPONENTS: Record<string, ComponentType<ChapterProps>> = { overview: Overview, tokenize: Tokenize, embed: Embed, attention: Attention, mlp: Mlp, output: Output, train: Train, params: Params, rag: Rag }
 
 export const CHAPTERS: ChapterDef[] = CHAPTER_META.map((m) => ({ ...m, component: COMPONENTS[m.id] }))

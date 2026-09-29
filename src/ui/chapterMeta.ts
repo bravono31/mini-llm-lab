@@ -13,6 +13,7 @@ export const CHAPTER_META: ChapterMeta[] = [
   { id: 'output', num: '06', title: '出力と次トークン' },
   { id: 'train', num: '07', title: '学習' },
   { id: 'params', num: '08', title: 'パラメータ一覧' },
+  { id: 'rag', num: '09', title: 'RAG（検索拡張）' },
 ]
 
 export function chapterLabel(id: string): string {
