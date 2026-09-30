@@ -394,23 +394,6 @@ a {
   text-align: right;
 }
 
-.speed {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--ink-3);
-  font-size: 12px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
-  padding: 4px 10px;
-  background: var(--paper-2);
-}
-
-.speed input[type='range'] {
-  width: 80px;
-  accent-color: var(--accent);
-}
-
 /* ---------- common blocks ---------- */
 .card {
   background: var(--paper-2);
@@ -743,19 +726,8 @@ table.data td.num {
     border-top: 0;
     border-bottom: 1px solid var(--line);
     padding: 10px 16px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .controls > .controls-row:first-child {
-    flex: 1;
-    min-width: 0;
   }
   .controls-sub {
-    margin-top: 0;
-  }
-  .controls .kbd-hint,
-  .controls .speed {
     display: none;
   }
   .explain-body {

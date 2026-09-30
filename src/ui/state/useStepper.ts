@@ -12,11 +12,6 @@ export interface Stepper {
   setIndex: (i: number) => void
   next: () => void
   prev: () => void
-  playing: boolean
-  togglePlay: () => void
-  /** milliseconds per step while playing */
-  interval: number
-  setInterval: (ms: number) => void
   count: number
 }
 
@@ -28,8 +23,6 @@ function isTypingTarget(el: EventTarget | null): boolean {
 
 export function useStepper(count: number, keyboard = true, onOverflow?: () => void, onUnderflow?: () => void, initial = 0): Stepper {
   const [index, setIndexState] = useState(() => Math.max(0, Math.min(count - 1, initial)))
-  const [playing, setPlaying] = useState(false)
-  const [interval, setIntervalMs] = useState(1800)
   const indexRef = useRef(index)
   indexRef.current = index
 
@@ -52,27 +45,6 @@ export function useStepper(count: number, keyboard = true, onOverflow?: () => vo
     indexRef.current = i - 1
     setIndexState(i - 1)
   }, [onUnderflow])
-  const togglePlay = useCallback(() => {
-    setPlaying((p) => {
-      if (!p && index >= count - 1) setIndexState(0)
-      return !p
-    })
-  }, [index, count])
-
-  useEffect(() => {
-    if (!playing) return
-    const id = window.setInterval(() => {
-      setIndexState((i) => {
-        if (i >= count - 1) {
-          setPlaying(false)
-          return i
-        }
-        return i + 1
-      })
-    }, interval)
-    return () => window.clearInterval(id)
-  }, [playing, interval, count])
-
   useEffect(() => {
     if (!keyboard) return
     const on = (e: KeyboardEvent) => {
@@ -83,14 +55,11 @@ export function useStepper(count: number, keyboard = true, onOverflow?: () => vo
       } else if (e.key === 'ArrowLeft') {
         e.preventDefault()
         prev()
-      } else if (e.key === ' ') {
-        e.preventDefault()
-        togglePlay()
       }
     }
     window.addEventListener('keydown', on)
     return () => window.removeEventListener('keydown', on)
-  }, [keyboard, next, prev, togglePlay])
+  }, [keyboard, next, prev])
 
-  return { index, setIndex, next, prev, playing, togglePlay, interval, setInterval: setIntervalMs, count }
+  return { index, setIndex, next, prev, count }
 }

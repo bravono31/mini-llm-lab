@@ -153,14 +153,7 @@ export function ChapterLayout({ num, title, lede, steps, aside, purpose, io, ter
             </span>
           </div>
           <div className="controls-row controls-sub">
-            <button className="ctl" onClick={s.togglePlay}>
-              {s.playing ? '⏸ 一時停止' : '自動再生'}
-            </button>
-            <label className="speed">
-              <span>速さ</span>
-              <input type="range" min={600} max={4000} step={200} value={5000 - s.interval} onChange={(e) => s.setInterval(5000 - Number(e.target.value))} />
-            </label>
-            <span className="muted small kbd-hint" style={{ marginLeft: 'auto' }}>
+            <span className="muted small">
               {atEnd && nextChapter ? `▶▶ で第 ${nextChapter.num} 章「${nextChapter.title}」へ` : atStart && prevChapter ? `◀◀ で第 ${prevChapter.num} 章「${prevChapter.title}」の最後へ` : '← → キーでも移動'}
             </span>
           </div>
