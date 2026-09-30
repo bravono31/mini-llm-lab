@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "typecheck": "tsc --noEmit -p tsconfig.json",
-    "pretrain": "tsx scripts/pretrain.ts"
+    "pretrain": "tsx scripts/pretrain.ts",
+    "rag-finetune": "tsx scripts/rag-finetune.ts"
   },
   "dependencies": {
     "react": "^19.3.0",

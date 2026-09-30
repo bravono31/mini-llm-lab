@@ -3,7 +3,8 @@ import { CORPORA } from '../src/data/corpus'
 import pretrainedEn from '../src/data/pretrained-en.json'
 import pretrainedJa from '../src/data/pretrained-ja.json'
 import { RAG_SETS } from '../src/data/rag-docs'
-import { cosine, idfWeights, retrieve } from '../src/engine/rag'
+import ragJa from '../src/data/rag-ja.json'
+import { checkpointParams, compare, cosine, idfWeights, retrieve, type RagCheckpoints } from '../src/engine/rag'
 import { loadPretrained, type Pretrained } from '../src/engine/serialize'
 import { UNK_ID, type Lang } from '../src/engine/tokenizer'
 
@@ -48,3 +49,29 @@ for (const lang of ['ja', 'en'] as Lang[]) {
     })
   })
 }
+
+describe('rag fine-tuned checkpoints (ja)', () => {
+  const { params, tokenizer } = loadPretrained(PRE.ja)
+  const { checkpoints } = ragJa as RagCheckpoints
+  const set = RAG_SETS.ja
+  const correct = (i: number) => {
+    const p = checkpointParams(params, checkpoints[i])
+    return set.questions.filter((q) => compare(p, tokenizer, q, set.docs[q.answer]).correct).length
+  }
+
+  it('starts from the pretrained model and stores full weights for later steps', () => {
+    expect(checkpoints[0]).toMatchObject({ step: 0, weights: [] })
+    expect(checkpointParams(params, checkpoints[0])).toBe(params)
+    for (let i = 1; i < checkpoints.length; i++) {
+      expect(checkpoints[i].step).toBeGreaterThan(checkpoints[i - 1].step)
+      expect(checkpoints[i].weights.length).toBe(params.data.length)
+    }
+  })
+
+  it('reads the document for more questions after fine-tuning than before', () => {
+    const last = correct(checkpoints.length - 1)
+    expect(last).toBeGreaterThanOrEqual(3)
+    expect(last).toBeGreaterThan(correct(0))
+    expect(checkpoints.at(-1)!.copyAcc).toBeGreaterThan(checkpoints[0].copyAcc)
+  })
+})

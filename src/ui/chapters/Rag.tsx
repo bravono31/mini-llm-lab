@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react'
 import { Term } from '../../content/glossary'
+import ragJa from '../../data/rag-ja.json'
 import { RAG_SETS } from '../../data/rag-docs'
-import { retrieve } from '../../engine/rag'
-import { displayToken, EOS, EOS_ID } from '../../engine/tokenizer'
+import { checkpointParams, compare, retrieve, type RagCheckpoints } from '../../engine/rag'
+import { displayToken, EOS, EOS_ID, type Lang } from '../../engine/tokenizer'
 import { ChapterLayout } from '../shell/ChapterLayout'
 import { useLab } from '../state/LabProvider'
 import type { Step } from '../state/useStepper'
@@ -12,6 +13,9 @@ import { Heatmap } from '../viz/Heatmap'
 import { TokenChips } from '../viz/TokenChips'
 import type { ChapterProps } from './index'
 import { Arrow, Seg, StickyBar } from './controls'
+import { AnswerView } from './RagAnswer'
+
+const RAG_MODELS: Partial<Record<Lang, RagCheckpoints>> = { ja: ragJa as RagCheckpoints }
 
 export function Rag(_: ChapterProps) {
   const lab = useLab()
@@ -20,6 +24,9 @@ export function Rag(_: ChapterProps) {
   const set = RAG_SETS[lang]
   const [qIdx, setQ] = useState(0)
   const [k, setK] = useState(2)
+  const checkpoints = RAG_MODELS[lang]?.checkpoints
+  const [ckSel, setCk] = useState<number | null>(null)
+  const ckIdx = checkpoints ? Math.min(ckSel ?? checkpoints.length - 1, checkpoints.length - 1) : 0
   const question = set.questions[qIdx]
 
   const docIds = useMemo(() => set.docs.map((d) => tokenizer.encode(d)), [set, tokenizer])
@@ -47,17 +54,32 @@ export function Rag(_: ChapterProps) {
   const promptTokens = tokenizer.tokensOf(promptIds)
   const retrievedPos = new Set(promptTokens.flatMap((_, i) => (i < promptIds.length - qIds.length && promptTokens[i] !== EOS ? [i] : [])))
 
-  const controls = (showK: boolean) => (
+  const pretrained = lab.session.pretrainedParams
+  const comparisons = useMemo(() => {
+    if (!checkpoints) return null
+    const params = checkpointParams(pretrained, checkpoints[ckIdx])
+    return set.questions.map((q) => compare(params, tokenizer, q, set.docs[retrieve(tokenizer.encode(q.text), docIds, tokenizer.vocabSize).order[0]]))
+  }, [pretrained, checkpoints, ckIdx, tokenizer, set, docIds])
+  const current = comparisons?.[qIdx]
+  const hits = comparisons?.filter((c) => c.correct).length ?? 0
+
+  const controls = (showK: boolean, showCk = false) => (
     <>
       <StickyBar>
         <div className="row" style={{ alignItems: 'center', gap: 18, flexWrap: 'wrap' }}>
           <Seg label="質問" value={qIdx} options={set.questions.map((q, i) => ({ value: i, label: q.text }))} onChange={setQ} />
           {showK && <Seg label="取り出す数 k" value={k} options={[1, 2, 3].map((v) => ({ value: v, label: String(v) }))} onChange={setK} />}
+          {showCk && checkpoints && <Seg label="追加学習" value={ckIdx} options={checkpoints.map((c, i) => ({ value: i, label: c.step ? c.step.toLocaleString() : '0（元）' }))} onChange={setCk} />}
         </div>
       </StickyBar>
       {showK && (
         <p className="controls-help" style={{ marginTop: 6 }}>
           <strong>k</strong>：類似度の高い順に、上から何件の文書を取り出してプロンプトに入れるか。
+        </p>
+      )}
+      {showCk && checkpoints && (
+        <p className="controls-help" style={{ marginTop: 6 }}>
+          <strong>追加学習</strong>：文書を読んで答える練習を、元のモデルに何ステップ追加したか。0 は第 02〜08 章と同じ元のモデル。
         </p>
       )}
     </>
@@ -164,6 +186,35 @@ export function Rag(_: ChapterProps) {
       ),
     },
     {
+      id: 'answer',
+      title: '実際に答えは変わるか：追加学習の量で比べる',
+      body: !comparisons || !current || !checkpoints ? (
+        <>
+          <p>
+            日本語版では、文書を読む練習を<strong>追加学習</strong>させたミニモデルで、文書を前に置くと答えが変わるかを実際に試せます。
+          </p>
+          <p>
+            英語版では用意できませんでした。英語のトークナイザは語彙にない単語（mountain、tomorrow など）を 1 文字ずつに分けるため、文書と書き出しを合わせると文脈長 {ctxLen} を超えてしまい、文書を読む練習そのものができないからです。上部で日本語に切り替えると試せます。
+          </p>
+        </>
+      ) : (
+        <>
+          <p>
+            元のミニモデル（追加学習 0）は、1 文ずつの続きを当てる<Term id="pretrain">事前学習</Term>しかしていないので、前に文書を置いても答えはほとんど変わりません。そこで「⟨eos⟩ 文書 ⟨eos⟩ 同じ文」という形の例で<strong>追加学習</strong>させました。2 回目の文の後半は 1 回目を読まないと当てられないので、モデルは「文書から写す」ことを覚えます。半分は答えがランダムな文字列の例で、丸暗記では解けません。この章の 8 文書は学習に含めていません。実際の LLM が事前学習のあとに行う事後学習の、ごく小さな版です。
+          </p>
+          <p>
+            このミニモデルは疑問文には答えられないので、「{current.q.cloze}」のような<strong>書き出しの続き</strong>を当てさせます。文書は第 5 ステップの検索で 1 位になった 1 件です（文脈長 {ctxLen} に収まるのが 1 件だけのため）。
+          </p>
+          <p>
+            上のバーで追加学習の量を切り替えてみてください。いまは {checkpoints[ckIdx].step.toLocaleString()} ステップで、{comparisons.length} 問中 <strong>{hits} 問</strong>で文書どおりの答えを出しています。下のグラフの「写す力」は、学習に一度も出てこなかった組み合わせの文をどれだけ写せるかで、追加学習の量とともに上がっていきます。
+          </p>
+          <p>
+            最後まで直らない問題もあります。「あしたは」の続きは、学習コーパスに「あしたははれる」がそのまま入っているため、覚えた知識が文書に勝ってしまいます（大きな LLM でも起きる、知識と文書の食い違いです）。「たま」のような名前を写すのも、この大きさのモデルには難しいようです。
+          </p>
+        </>
+      ),
+    },
+    {
       id: 'flow',
       title: '全体の流れと、このミニモデルの限界',
       body: (
@@ -172,7 +223,7 @@ export function Rag(_: ChapterProps) {
             まとめると、RAG は<strong>検索</strong>（ここまでの計算）と<strong>生成</strong>（第 02〜06 章の計算）をつなぐだけの仕組みです。実際のシステムでは、トークンの回数の代わりに、意味の近さを学習した専用の<Term id="embedding">埋め込み</Term>モデルでベクトルを作ることが多く、言い換え（「くろい」と「黒色」）にも強くなります。
           </p>
           <p>
-            <strong>正直な注意：</strong>このアプリのミニモデルに上のプロンプトを渡しても、答えは変わりません（実際に試しました）。このモデルは 1 文ずつの続きを当てる<Term id="pretrain">事前学習</Term>しかしておらず、「文脈から答えを抜き出す」ことを学んでいないからです。大きな LLM は、大量の学習と指示に従わせる追加の学習によって、この読み取りができるようになっています。
+            <strong>限界：</strong>日本語版の前のステップで見たとおり、このミニモデルは追加学習をしても、文書を正しく読めるのは一部の問題だけです。大きな LLM は、桁違いの大きさと学習量、それに指示に従わせる追加の学習によって、長い文書から必要な部分を探して読み取れるようになっています。
           </p>
         </>
       ),
@@ -255,6 +306,17 @@ export function Rag(_: ChapterProps) {
                 valueWidth={200}
                 title={`質問「${question.text}」とのコサイン類似度`}
               />
+            </div>
+          )
+        if (step.id === 'answer')
+          return (
+            <div className="col">
+              {controls(false, true)}
+              {comparisons && current && checkpoints ? (
+                <AnswerView current={current} all={comparisons} checkpoints={checkpoints} ckIdx={ckIdx} tok={tokenizer} />
+              ) : (
+                <div className="card muted">英語版ではこのステップの実験はありません（理由は説明を参照）。</div>
+              )}
             </div>
           )
         if (step.id === 'prompt')
