@@ -174,11 +174,12 @@ a {
 
 .body {
   display: grid;
-  grid-template-columns: 208px minmax(0, 1fr) 380px;
+  grid-template-columns: 208px 380px minmax(0, 1fr);
   min-height: 0;
 }
 
 .rail {
+  order: 1;
   border-right: 1px solid var(--line);
   padding: 28px 12px;
   position: sticky;
@@ -238,6 +239,7 @@ a {
 }
 
 .stage {
+  order: 3;
   padding: 32px 36px 64px;
   min-width: 0;
 }
@@ -265,7 +267,8 @@ a {
 }
 
 .explain {
-  border-left: 1px solid var(--line);
+  order: 2;
+  border-right: 1px solid var(--line);
   display: flex;
   flex-direction: column;
   position: sticky;
@@ -322,6 +325,10 @@ a {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.controls-sub {
+  margin-top: 10px;
 }
 
 .ctl {
@@ -702,14 +709,10 @@ table.data td.num {
   .body {
     grid-template-columns: 1fr;
   }
-  .rail,
-  .explain {
+  .rail {
     position: static;
     height: auto;
     border: 0;
-  }
-  .rail {
-    order: 1;
     border-bottom: 1px solid var(--line);
     padding: 12px 16px;
   }
@@ -725,16 +728,44 @@ table.data td.num {
     display: none;
   }
   .stage {
-    order: 3;
+    order: 4;
     padding: 24px 16px 32px;
   }
+  /* children become rows of .body so the step controls stay pinned over the whole page, not just the explanation */
   .explain {
+    display: contents;
+  }
+  .controls {
     order: 2;
-    border-top: 1px solid var(--line);
+    position: sticky;
+    top: var(--topbar-h, 61px);
+    z-index: 6;
+    border-top: 0;
     border-bottom: 1px solid var(--line);
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .controls > .controls-row:first-child {
+    flex: 1;
+    min-width: 0;
+  }
+  .controls-sub {
+    margin-top: 0;
+  }
+  .controls .kbd-hint,
+  .controls .speed {
+    display: none;
   }
   .explain-body {
+    order: 3;
     padding: 20px 16px;
+    border-bottom: 1px solid var(--line);
+    scroll-margin-top: calc(var(--topbar-h, 61px) + var(--stepbar-h, 0px));
+  }
+  .stage .sticky-controls {
+    top: calc(var(--topbar-h, 61px) + var(--stepbar-h, 0px));
   }
   .topbar {
     flex-wrap: wrap;

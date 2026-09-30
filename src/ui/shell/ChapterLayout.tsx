@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { useEffect, useLayoutEffect, useRef, type ReactNode } from 'react'
 import { GlossaryList } from '../../content/glossary'
 import { CHAPTER_META, chapterLabel } from '../chapterMeta'
 import { useNav } from '../state/NavProvider'
@@ -35,6 +35,39 @@ export function ChapterLayout({ num, title, lede, steps, aside, purpose, io, ter
   const atEnd = s.index >= steps.length - 1
   const atStart = s.index === 0
   const step = steps[s.index]
+  const bodyRef = useRef<HTMLDivElement>(null)
+  const controlsRef = useRef<HTMLDivElement>(null)
+  const firstRender = useRef(true)
+
+  // sticky offsets on narrow screens depend on the (wrapping) top bar and the step bar heights
+  useLayoutEffect(() => {
+    const topbar = document.querySelector<HTMLElement>('.topbar')
+    const controls = controlsRef.current
+    if (!topbar || !controls) return
+    const root = document.documentElement.style
+    const update = () => {
+      root.setProperty('--topbar-h', `${topbar.offsetHeight}px`)
+      root.setProperty('--stepbar-h', `${controls.offsetHeight}px`)
+    }
+    update()
+    const ro = new ResizeObserver(update)
+    ro.observe(topbar)
+    ro.observe(controls)
+    return () => ro.disconnect()
+  }, [])
+
+  useEffect(() => {
+    if (firstRender.current) {
+      firstRender.current = false
+      return
+    }
+    const body = bodyRef.current
+    if (!body) return
+    body.scrollTop = 0
+    if (!matchMedia('(max-width: 1100px)').matches) return
+    const pinned = parseFloat(getComputedStyle(body).scrollMarginTop) || 0
+    if (body.getBoundingClientRect().top < pinned) body.scrollIntoView({ block: 'start' })
+  }, [s.index])
   return (
     <>
       <section className="stage">
@@ -76,7 +109,7 @@ export function ChapterLayout({ num, title, lede, steps, aside, purpose, io, ter
         )}
       </section>
       <aside className="explain">
-        <div className="explain-body">
+        <div className="explain-body" ref={bodyRef}>
           <div className="step-label">
             STEP {s.index + 1} / {steps.length}
           </div>
@@ -87,7 +120,7 @@ export function ChapterLayout({ num, title, lede, steps, aside, purpose, io, ter
           </div>
           {aside && <div style={{ marginTop: 20 }}>{aside}</div>}
         </div>
-        <div className="controls">
+        <div className="controls" ref={controlsRef}>
           <div className="controls-row">
             <button
               className="ctl"
@@ -116,7 +149,7 @@ export function ChapterLayout({ num, title, lede, steps, aside, purpose, io, ter
               {s.index + 1} / {steps.length}
             </span>
           </div>
-          <div className="controls-row" style={{ marginTop: 10 }}>
+          <div className="controls-row controls-sub">
             <button className="ctl" onClick={s.togglePlay}>
               {s.playing ? '⏸ 一時停止' : '自動再生'}
             </button>
@@ -124,7 +157,7 @@ export function ChapterLayout({ num, title, lede, steps, aside, purpose, io, ter
               <span>速さ</span>
               <input type="range" min={600} max={4000} step={200} value={5000 - s.interval} onChange={(e) => s.setInterval(5000 - Number(e.target.value))} />
             </label>
-            <span className="muted small" style={{ marginLeft: 'auto' }}>
+            <span className="muted small kbd-hint" style={{ marginLeft: 'auto' }}>
               {atEnd && nextChapter ? `▶▶ で第 ${nextChapter.num} 章「${nextChapter.title}」へ` : atStart && prevChapter ? `◀◀ で第 ${prevChapter.num} 章「${prevChapter.title}」の最後へ` : '← → キーでも移動'}
             </span>
           </div>
