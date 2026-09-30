@@ -64,7 +64,10 @@ export function ChapterLayout({ num, title, lede, steps, aside, purpose, io, ter
     const body = bodyRef.current
     if (!body) return
     body.scrollTop = 0
-    if (!matchMedia('(max-width: 1100px)').matches) return
+    if (!matchMedia('(max-width: 1100px)').matches) {
+      window.scrollTo({ top: 0 })
+      return
+    }
     const pinned = parseFloat(getComputedStyle(body).scrollMarginTop) || 0
     if (body.getBoundingClientRect().top < pinned) body.scrollIntoView({ block: 'start' })
   }, [s.index])
