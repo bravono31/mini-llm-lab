@@ -39,6 +39,8 @@ export function Rag(_: ChapterProps) {
   const topSet = new Set(top)
   const docLabels = set.docs.map((_, i) => `文書 ${i + 1}`)
   const docNums = set.docs.map((_, i) => String(i + 1))
+  const N = set.docs.length
+  const docBand = { label: `文書 1〜${N}`, color: 'var(--ink-3)' }
   const rowLabelWidth = lang === 'ja' ? 64 : 72
 
   const promptIds = [...top.flatMap((i) => [...docIds[i], EOS_ID]), ...qIds]
@@ -126,7 +128,7 @@ export function Rag(_: ChapterProps) {
           <p>
             質問「{question.text}」も、<strong>文書と同じトークナイザ・同じ IDF</strong> でベクトルにします。同じ座標系に置かないと比べられないからです。
           </p>
-          <p>左端の列が質問ベクトル、残りが文書ベクトルです。質問に出てこないトークンの行は薄くしてあり、朱枠は「質問と同じトークンを文書も持っている」セルです。朱枠が多く、しかも IDF の大きいトークンで一致している文書ほど似ていることになります。上のバーで質問を切り替えられます。</p>
+          <p>左端の列（q）が質問ベクトル、1〜{set.docs.length} の列がそれぞれ文書 1〜{set.docs.length} のベクトルです。質問に出てこないトークンの行は薄くしてあり、朱枠は「質問と同じトークンを文書も持っている」セルです。朱枠が多く、しかも IDF の大きいトークンで一致している文書ほど似ていることになります。上のバーで質問を切り替えられます。</p>
         </>
       ),
       formula: `q[w] = count_q[w] · idf[w]`,
@@ -212,7 +214,7 @@ export function Rag(_: ChapterProps) {
         if (step.id === 'count')
           return (
             <div className="row" style={{ flexWrap: 'wrap', alignItems: 'flex-start' }}>
-              <Heatmap values={countMat} rows={cols.length} cols={set.docs.length} mode="sequential" cell={30} cellH={20} rowLabels={colLabels} rowLabelWidth={rowLabelWidth} colLabels={docNums} showValues digits={0} legend title={`トークンの出現回数（${cols.length} トークン × ${set.docs.length} 文書）`} rowName="トークン" colName="文書" rowAxis="トークン（文書か質問に出るものだけ）" colAxis="文書（1 列 = 1 文書）" tag="computed" />
+              <Heatmap values={countMat} rows={cols.length} cols={set.docs.length} mode="sequential" cell={30} cellH={20} rowLabels={colLabels} rowLabelWidth={rowLabelWidth} colLabels={docNums} colGroups={[{ ...docBand, from: 0, to: N }]} showValues digits={0} legend title={`トークンの出現回数（${cols.length} トークン × ${set.docs.length} 文書）`} rowName="トークン" colName="文書" rowAxis="トークン（文書か質問に出るものだけ）" colAxis="文書（1 列 = 1 文書）" tag="computed" />
               <div className="card grow">{docList}</div>
             </div>
           )
@@ -237,7 +239,7 @@ export function Rag(_: ChapterProps) {
                 <div className="card-title">質問のトークン</div>
                 <TokenChips tokens={tokenizer.tokensOf(qIds)} />
               </div>
-              <Heatmap values={tfidfMat} rows={cols.length} cols={set.docs.length + 1} mode="sequential" cell={30} cellH={20} rowLabels={colLabels} rowLabelWidth={rowLabelWidth} colLabels={['質問', ...docNums]} highlightRows={qRows} highlightCells={matches} dimOthers showValues digits={1} legend title="質問ベクトル q と文書ベクトル（TF-IDF）" rowName="トークン" colName="列" rowAxis="トークン（薄い行 = 質問に出ない）" colAxis="左端 = 質問、1〜8 = 文書" tag="computed" />
+              <Heatmap values={tfidfMat} rows={cols.length} cols={set.docs.length + 1} mode="sequential" cell={30} cellH={20} rowLabels={colLabels} rowLabelWidth={rowLabelWidth} colLabels={['q', ...docNums]} colGroups={[{ label: '質問', from: 0, to: 1, color: 'var(--accent)' }, { ...docBand, from: 1, to: N + 1 }]} highlightRows={qRows} highlightCells={matches} dimOthers showValues digits={1} legend title="質問ベクトル q と文書ベクトル（TF-IDF）" rowName="トークン" rowAxis="トークン（薄い行 = 質問に出ない）" colAxis={`左端 q = 質問、1〜${N} = 文書の番号（列番号ではない）`} tag="computed" />
             </div>
           )
         if (step.id === 'score')
