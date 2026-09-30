@@ -45,13 +45,20 @@ export function Rag(_: ChapterProps) {
   const promptTokens = tokenizer.tokensOf(promptIds)
   const retrievedPos = new Set(promptTokens.flatMap((_, i) => (i < promptIds.length - qIds.length && promptTokens[i] !== EOS ? [i] : [])))
 
-  const controls = (
-    <StickyBar>
-      <div className="row" style={{ alignItems: 'center', gap: 18, flexWrap: 'wrap' }}>
-        <Seg label="質問" value={qIdx} options={set.questions.map((q, i) => ({ value: i, label: q.text }))} onChange={setQ} />
-        <Seg label="取り出す数 k" value={k} options={[1, 2, 3].map((v) => ({ value: v, label: String(v) }))} onChange={setK} />
-      </div>
-    </StickyBar>
+  const controls = (showK: boolean) => (
+    <>
+      <StickyBar>
+        <div className="row" style={{ alignItems: 'center', gap: 18, flexWrap: 'wrap' }}>
+          <Seg label="質問" value={qIdx} options={set.questions.map((q, i) => ({ value: i, label: q.text }))} onChange={setQ} />
+          {showK && <Seg label="取り出す数 k" value={k} options={[1, 2, 3].map((v) => ({ value: v, label: String(v) }))} onChange={setK} />}
+        </div>
+      </StickyBar>
+      {showK && (
+        <p className="controls-help" style={{ marginTop: 6 }}>
+          <strong>k</strong>：類似度の高い順に、上から何件の文書を取り出してプロンプトに入れるか。
+        </p>
+      )}
+    </>
   )
 
   const docList = (
@@ -91,7 +98,7 @@ export function Rag(_: ChapterProps) {
       body: (
         <>
           <p>
-            検索するには「似ているか」を数で測れる必要があります。いちばん素朴な方法は、文書に<strong>どのトークンが何回出たか</strong>を数えることです。第 02 章のトークナイザで区切り、語彙の列ごとに回数を書き込むと、1 文書 = 1 本の<Term id="vector">ベクトル</Term>になります。
+            検索するには「似ているか」を数で測れる必要があります。いちばん素朴な方法は、文書に<strong>どのトークンが何回出たか</strong>を数えることです。<Term id="tokenizer">トークナイザ</Term>（文字列をトークンの列に切り分ける仕組み。第 02 章）で区切り、語彙の列ごとに回数を書き込むと、1 文書 = 1 本の<Term id="vector">ベクトル</Term>になります。
           </p>
           <p>右の表は 1 列が 1 文書のベクトルです。語順は捨てています（「ねこがいぬを」と「いぬがねこを」は同じベクトル）。それでも検索にはかなり使えます。行は、文書か質問に 1 回以上出るトークンだけに絞って表示しています。</p>
         </>
@@ -189,7 +196,7 @@ export function Rag(_: ChapterProps) {
         </>
       }
       io="質問文 ＋ 文書集 → 関係する文書を前に付けたプロンプト"
-      terms={['rag', 'tfidf', 'cosine', 'vector', 'embedding', 'context', 'pretrain']}
+      terms={['rag', 'tokenizer', 'tfidf', 'cosine', 'vector', 'embedding', 'context', 'pretrain']}
       steps={steps}
     >
       {(step) => {
@@ -225,7 +232,7 @@ export function Rag(_: ChapterProps) {
         if (step.id === 'query')
           return (
             <div className="col">
-              {controls}
+              {controls(false)}
               <div className="card">
                 <div className="card-title">質問のトークン</div>
                 <TokenChips tokens={tokenizer.tokensOf(qIds)} />
@@ -236,7 +243,7 @@ export function Rag(_: ChapterProps) {
         if (step.id === 'score')
           return (
             <div className="col">
-              {controls}
+              {controls(true)}
               <BarChart
                 items={r.order.map((i) => ({ label: docLabels[i], value: r.scores[i], sub: set.docs[i], highlight: topSet.has(i), muted: !topSet.has(i) }))}
                 min={0}
@@ -251,7 +258,7 @@ export function Rag(_: ChapterProps) {
         if (step.id === 'prompt')
           return (
             <div className="col">
-              {controls}
+              {controls(true)}
               <div className="card">
                 <div className="card-title">モデルに渡す文章</div>
                 <div className="mono" style={{ whiteSpace: 'pre-wrap', lineHeight: 1.9 }}>
