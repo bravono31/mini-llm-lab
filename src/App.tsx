@@ -2,6 +2,7 @@ import { CHAPTERS } from './ui/chapters'
 import { ChapterRail } from './ui/shell/ChapterRail'
 import { TopBar } from './ui/shell/TopBar'
 import { LabProvider } from './ui/state/LabProvider'
+import { MlProvider } from './ui/state/MlProvider'
 import { NavProvider, useNav } from './ui/state/NavProvider'
 import { ThemeProvider } from './ui/state/ThemeProvider'
 
@@ -25,7 +26,9 @@ export default function App() {
     <ThemeProvider>
       <NavProvider>
         <LabProvider>
-          <Body />
+          <MlProvider>
+            <Body />
+          </MlProvider>
         </LabProvider>
       </NavProvider>
     </ThemeProvider>

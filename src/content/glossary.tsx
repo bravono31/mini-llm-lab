@@ -56,6 +56,22 @@ export const GLOSSARY: Record<string, GlossaryEntry> = {
   rag: { term: 'RAG（検索拡張生成）', short: 'Retrieval-Augmented Generation。質問に関係する文書を検索し、プロンプトに書き足してから生成させる仕組み。重みを変えずに、モデルが学習していない知識を使わせられる。', chapter: 'rag' },
   tfidf: { term: 'TF-IDF', short: 'トークンの出現回数（TF）に、そのトークンの珍しさ（IDF）を掛けた重み。どの文書にも出る語を軽く、特定の文書にしか出ない語を重く扱う、古典的な検索の手法。', chapter: 'rag' },
   cosine: { term: 'コサイン類似度', short: '2 本のベクトルのなす角の cos。向きが同じなら 1、直交（共通の成分なし）なら 0。ベクトルの長さに左右されないので、文書の近さを測るのによく使う。', chapter: 'rag' },
+  ai: { term: 'AI（人工知能）', short: '人の知的な振る舞い（判断・認識・言語など）をコンピュータで実現しようとする技術や研究の総称。ルールを人が書く方法も、データから学ぶ機械学習も含む。', chapter: 'map' },
+  ml: { term: '機械学習', short: '人がルールを書く代わりに、例（データ）からコンピュータに規則（重み）を決めさせる方法。LLM も機械学習の一種。', chapter: 'ml-overview' },
+  supervised: { term: '教師あり学習 / 分類', short: '入力と、人が付けた正解（ラベル）の組から学ぶ機械学習。決められた選択肢から 1 つを選ぶ問題を分類と呼ぶ。ML 編の話題当てはこれ。', chapter: 'ml-overview' },
+  selfsupervised: { term: '自己教師あり学習', short: '正解をデータ自身から作る学習。LLM の事前学習では「文の続き」が正解なので、人がラベルを付けずに大量の文章を使える。', chapter: 'ml-data' },
+  label: { term: 'ラベル', short: '教師あり学習で、各入力に人が付ける正解。ここでは文の話題（いきもの / しぜん / ひと）。', chapter: 'ml-data' },
+  testdata: { term: '学習データ / テストデータ', short: '学習に使う例と、学習に使わず成績を測るためだけに取っておく例。テストデータの成績が「新しい入力にも通用するか」の目安になる。', chapter: 'ml-data' },
+  feature: { term: '特徴量', short: '生のデータ（文や画像）を、モデルが計算できる数の並びに直したもの。古典的な機械学習では何を特徴にするかを人が設計する。深層学習は特徴も学習で決める。', chapter: 'ml-features' },
+  bow: { term: 'Bag-of-Words（単語の袋）', short: '文を「どの語が何回出たか」の回数のベクトルにする特徴量。語の順番は捨てられる。', chapter: 'ml-features' },
+  logreg: { term: 'ロジスティック回帰', short: '特徴量に重みを掛けて足した点数を、softmax（2 クラスならシグモイド）で確率にする分類モデル。名前に「回帰」とあるが分類に使う。LLM の出力層も同じ形。', chapter: 'ml-model' },
+  accuracy: { term: '正解率', short: '予測がラベルと一致した割合。テストデータで測るのが原則。', chapter: 'ml-eval' },
+  confusion: { term: '混同行列', short: '「正解のクラス × 予測したクラス」で件数を数えた表。どのクラスをどのクラスと間違えやすいかが分かる。', chapter: 'ml-eval' },
+  overfit: { term: '過学習', short: '学習データに合わせすぎて、たまたまの特徴まで覚えてしまい、新しいデータで成績が伸びない（悪くなる）こと。データが少ないほど起きやすい。', chapter: 'ml-eval' },
+  nn: { term: 'ニューラルネットワーク', short: 'ノード（数値）を重み付きの線でつなぎ、層を重ねて計算するモデル。脳の神経回路から着想を得た。Transformer もその一種。', chapter: 'map' },
+  deeplearning: { term: '深層学習（ディープラーニング）', short: '層を深く重ねたニューラルネットワークを学習させる機械学習の手法。特徴量を人が設計せず、データから学ばせるのが特徴。LLM はこれ。', chapter: 'map' },
+  nlp: { term: '自然言語処理（NLP）', short: '人の言語をコンピュータで扱う研究分野。ルールベース、古典的な機械学習（ML 編の分類）、LLM など、手法は時代とともに変わってきた。', chapter: 'map' },
+  genai: { term: '生成 AI', short: '文章・画像・音声などを新しく作り出す AI の総称。手法の名前ではなく用途による呼び名で、文章なら LLM、画像なら拡散モデルなどが使われる。', chapter: 'map' },
 }
 
 /** Inline term: dotted underline, hover for a definition, click to jump to the glossary at the page bottom. */

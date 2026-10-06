@@ -1017,3 +1017,14 @@ table.data td.num {
     grid-template-columns: 1fr;
   }
 }
+
+/* ---------- machine-learning part ---------- */
+.class-badge {
+  display: inline-block;
+  padding: 0 8px;
+  border: 1px solid;
+  border-radius: 999px;
+  font-size: 12px;
+  line-height: 1.7;
+  white-space: nowrap;
+}
