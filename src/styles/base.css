@@ -1029,30 +1029,6 @@ table.data td.num {
   white-space: nowrap;
 }
 
-.map-nest {
-  border: 1px solid var(--line-2);
-  border-radius: var(--radius);
-  padding: 12px 14px 14px;
-  margin-top: 10px;
-  background: var(--paper);
-}
-
-.map-nest .map-nest {
-  background: var(--paper-2);
-}
-
-.map-nest .map-nest .map-nest {
-  background: var(--paper);
-}
-
-.map-nest.innermost {
-  border-color: var(--accent);
-  background: var(--accent-soft);
-}
-
-.map-nest:first-child {
-  margin-top: 0;
-}
 
 .map-nest-head {
   display: flex;
@@ -1081,4 +1057,74 @@ table.data td.num {
   margin-left: 6px;
   font-size: 11px;
   color: var(--accent);
+}
+
+.map-tree {
+  display: grid;
+  grid-template-columns: 72px 1fr 1fr;
+  gap: 14px 10px;
+  max-width: 760px;
+}
+
+.map-tree-rank {
+  font-size: 11px;
+  color: var(--ink-3);
+  padding-top: 12px;
+  line-height: 1.4;
+}
+
+.map-tree-head {
+  font-family: var(--font-serif);
+  font-size: 12px;
+  color: var(--ink-3);
+  text-align: center;
+  margin-bottom: -6px;
+}
+
+.map-tree-cell {
+  position: relative;
+  border: 1px solid var(--line-2);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  background: var(--paper-2);
+  min-width: 0;
+}
+
+.map-tree-cell.shared {
+  grid-column: 2 / 4;
+  background: var(--paper);
+}
+
+/* connector to the box above */
+.map-tree-cell::before {
+  content: '';
+  position: absolute;
+  top: -15px;
+  left: 50%;
+  height: 14px;
+  border-left: 1.5px solid var(--line-2);
+}
+
+.map-tree-head + .map-tree-head + .map-tree-rank + .map-tree-cell::before {
+  display: none;
+}
+
+.map-tree-cell.split {
+  border-color: var(--ink-3);
+}
+
+.map-tree-cell.here {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.map-tree-other {
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--ink-4);
+}
+
+.map-lineage td.shared {
+  text-align: center;
+  background: var(--paper);
 }
