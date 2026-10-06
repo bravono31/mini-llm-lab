@@ -2,6 +2,7 @@ import type { ComponentType } from 'react'
 import { CHAPTER_META, type ChapterMeta } from '../chapterMeta'
 import { Attention } from './Attention'
 import { Embed } from './Embed'
+import { MapChapter } from './Map'
 import { Mlp } from './Mlp'
 import { MlCompare } from './MlCompare'
 import { MlData } from './MlData'
@@ -26,6 +27,7 @@ export interface ChapterDef extends ChapterMeta {
 }
 
 const COMPONENTS: Record<string, ComponentType<ChapterProps>> = {
+  map: MapChapter,
   'ml-overview': MlOverview,
   'ml-data': MlData,
   'ml-features': MlFeatures,

@@ -10,6 +10,7 @@ export interface ChapterMeta {
 export const PART_TITLES: Record<Part, string> = { map: '全体像', ml: '機械学習編', llm: 'LLM 編' }
 
 export const CHAPTER_META: ChapterMeta[] = [
+  { id: 'map', part: 'map', num: 'MAP', title: 'AI・機械学習・LLM の地図' },
   { id: 'ml-overview', part: 'ml', num: 'ML-1', title: '概要' },
   { id: 'ml-data', part: 'ml', num: 'ML-2', title: 'データとラベル' },
   { id: 'ml-features', part: 'ml', num: 'ML-3', title: '特徴量' },

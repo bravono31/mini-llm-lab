@@ -1028,3 +1028,57 @@ table.data td.num {
   line-height: 1.7;
   white-space: nowrap;
 }
+
+.map-nest {
+  border: 1px solid var(--line-2);
+  border-radius: var(--radius);
+  padding: 12px 14px 14px;
+  margin-top: 10px;
+  background: var(--paper);
+}
+
+.map-nest .map-nest {
+  background: var(--paper-2);
+}
+
+.map-nest .map-nest .map-nest {
+  background: var(--paper);
+}
+
+.map-nest.innermost {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.map-nest:first-child {
+  margin-top: 0;
+}
+
+.map-nest-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.map-nest-name {
+  font-family: var(--font-serif);
+  font-size: 16px;
+}
+
+.map-nest-note {
+  color: var(--ink-3);
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+.map-axes td.gen {
+  outline: 1.5px solid var(--accent);
+  outline-offset: -3px;
+}
+
+.gen-mark {
+  margin-left: 6px;
+  font-size: 11px;
+  color: var(--accent);
+}

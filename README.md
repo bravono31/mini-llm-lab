@@ -5,6 +5,14 @@ LLM の学習と推論の過程を、実際の数値・パラメータを見な�
 トークン化 → 埋め込み → 注意機構 → MLP → 出力確率 → サンプリング、そして 損失 → 逆伝播 → AdamW 更新 までを
 すべて可視化します。
 
+目次は 3 部構成です。
+
+| 部 | 章 | 内容 |
+|---|---|---|
+| 全体像 | MAP | AI・機械学習・ニューラルネットワーク・深層学習・Transformer・LLM の入れ子と、自然言語処理・生成 AI との関係 |
+| 機械学習編 | ML-1〜7 | LLM と同じ文集の「話題当て」を、人が作った単語辞書の Bag-of-Words とロジスティック回帰で学習・評価し、LLM と比べる |
+| LLM 編 | LLM-1〜9 | ミニ GPT の推論・学習・RAG |
+
 ## 起動
 
 ```bash
@@ -25,8 +33,10 @@ npm run pretrain   # 両コーパスを学習し src/data/pretrained-*.json を�
 |---|---|
 | `src/engine/` | 数値計算エンジン。自動微分は使わず、層ごとに forward / backward を明示実装（llm.c 方式）。中間活性がすべて名前付きバッファとして残るので UI がそのまま表示できる |
 | `src/engine/tokenizer.ts` | ミニ BPE。マージ履歴とエンコード手順を記録し、UI で再生できる |
+| `src/engine/classifier.ts` | ML 編の分類器。辞書による単語の区切り（動的計画法）、Bag-of-Words、softmax 回帰と勾配降下 |
+| `src/data/ml-labels.ts` | ML 編の話題ラベル（人手）と単語辞書 |
 | `src/data/` | 日本語（ひらがな）と英語のコーパス、事前学習済み重み（JSON） |
-| `src/ui/chapters/` | 8 つの章。各章は `Step[]`（解説 + 数式）と、ステップごとの可視化を持つ |
+| `src/ui/chapters/` | 全体像・ML 編 7 章・LLM 編 9 章。各章は `Step[]`（解説 + 数式）と、ステップごとの可視化を持つ |
 | `src/ui/viz/` | ヒートマップ、棒グラフ、注意の弧、損失曲線、行列積など SVG コンポーネント |
 | `scripts/pretrain.ts` | Node で事前学習して JSON を書き出す |
 | `tests/` | vitest |
