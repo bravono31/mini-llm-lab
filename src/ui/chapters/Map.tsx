@@ -22,7 +22,7 @@ const TREE: { rank: string; shared?: TreeCell & { other?: string; split?: boolea
   { rank: '分野', shared: { name: '機械学習', note: 'ルールを書かず、データから規則（重み）を学ぶ', other: 'ほかの枝：ルールを人が書く AI' } },
   {
     rank: 'モデルの種類',
-    shared: { name: 'ニューラルネットワーク', note: '入力 × 重みの和を次へ渡す計算を、層にしたもの', link: { id: 'overview', label: 'LLM-1' }, other: 'ほかの枝：決定木・SVM など', split: true },
+    shared: { name: 'ニューラルネットワーク', note: '入力 × 重みの和を次へ渡す計算を、層にしたもの', link: { id: 'overview', label: 'LLM-1' }, other: 'ほかの枝：決定木・SVM など（これも古典的な機械学習）', split: true },
   },
   {
     rank: '深さ',
@@ -34,7 +34,7 @@ const TREE: { rank: string; shared?: TreeCell & { other?: string; split?: boolea
   {
     rank: 'モデル構造',
     pair: [
-      { name: '線形モデル（ロジスティック回帰）', note: '特徴は人が設計した単語の回数', link: { id: 'ml-model', label: 'ML-4' } },
+      { name: '線形モデル（ロジスティック回帰）', note: '古典的な機械学習の代表。特徴は人が設計した単語の回数', link: { id: 'ml-model', label: 'ML-4' } },
       { name: 'Transformer', note: '注意機構と MLP を積んだ構造', link: { id: 'attention', label: 'LLM-4' } },
     ],
   },
@@ -217,6 +217,9 @@ export function MapChapter({ onNavigate }: ChapterProps) {
           <p>
             「機械学習と LLM を比べる」と言うと、LLM を含む広い分野と LLM を比べることになり、段がそろいません。この図の同じ段にいる 2 つを比べるのが、このアプリでの対比です。
           </p>
+          <p>
+            なお「古典的な機械学習」は、深層学習以外の機械学習をまとめた呼び名で、系統樹の 1 本の枝ではありません。ロジスティック回帰は浅い枝に、決定木や SVM はニューラルネットワークの外の枝にいます。生物でいう「魚類」のように、共通の祖先から出た枝をまるごとまとめた群ではなく、「深層学習を除いた残り」として決まる群です。
+          </p>
           <p>各段の「→」から、その段を扱っている章へ移動できます。</p>
         </>
       ),
@@ -267,7 +270,7 @@ export function MapChapter({ onNavigate }: ChapterProps) {
       body: (
         <>
           <p>
-            <strong>機械学習編</strong>（ML-1〜7）では、いちばん素朴な機械学習で「データ → 特徴量 → モデル → 学習 → 評価」の流れを見ます。<strong>LLM 編</strong>（LLM-1〜9）では、同じ文集を使うミニ LLM の中身を、実際の数値で 1 段ずつ見ます。
+            <strong>古典的機械学習編</strong>（ML-1〜7）では、いちばん素朴な機械学習で「データ → 特徴量 → モデル → 学習 → 評価」の流れを見ます。<strong>LLM 編</strong>（LLM-1〜9）では、同じ文集を使うミニ LLM の中身を、実際の数値で 1 段ずつ見ます。
           </p>
           <p>ML 編を先に読むと、LLM の何が新しいのかが分かりやすくなります（ML-7 で両者を比べます）。LLM 編から読み始めてもかまいません。</p>
           <p>深層学習一般（画像の CNN など）や、画像生成の拡散モデルは、いまのところこのアプリでは扱っていません。</p>

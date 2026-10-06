@@ -7,7 +7,7 @@ export interface ChapterMeta {
   title: string
 }
 
-export const PART_TITLES: Record<Part, string> = { map: '全体像', ml: '機械学習編', llm: 'LLM 編' }
+export const PART_TITLES: Record<Part, string> = { map: '全体像', ml: '古典的機械学習編', llm: 'LLM 編' }
 
 export const CHAPTER_META: ChapterMeta[] = [
   { id: 'map', part: 'map', num: 'MAP', title: 'AI・機械学習・LLM の地図' },
