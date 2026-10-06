@@ -236,7 +236,6 @@ export function Attention(_: { onNavigate: (id: string) => void }) {
 
   return (
     <ChapterLayout
-      num="04"
       title="注意機構"
       lede="各トークンが文中の他のトークンを見渡し、関係の深い相手から情報を集める。Transformer の核心です。"
       purpose={
@@ -321,7 +320,7 @@ export function Attention(_: { onNavigate: (id: string) => void }) {
                 <div className="card-title">1 回の forward で、全位置の「次トークン」の確率が同時に出る</div>
                 <Heatmap values={acts.probs} rows={T} cols={params.config.vocabSize} cell={Math.max(4, Math.min(8, Math.floor(560 / params.config.vocabSize)))} cellH={18} gap={0} mode="sequential" max={1} rowLabels={disp.map((d, i) => `${i} ${d}`)} rowLabelWidth={70} tag="computed" rowAxis="位置 t（その位置までを見て「次」を予測）" colAxis="語彙の各トークン（濃いほど高確率）" legend />
                 <p className="muted small" style={{ marginTop: 8 }}>
-                  マスクのおかげで行 t は位置 t までしか見ていないので、{T} 行すべてが「そこまで読んだ時点の予測」として同時に使えます。第 06 章の最後のステップに、行ごとの予測の表があります。
+                  マスクのおかげで行 t は位置 t までしか見ていないので、{T} 行すべてが「そこまで読んだ時点の予測」として同時に使えます。LLM-6 の最後のステップに、行ごとの予測の表があります。
                 </p>
               </div>
             </>

@@ -186,7 +186,7 @@ export function Output(_: { onNavigate: (id: string) => void }) {
       body: (
         <>
           <p>
-            forward は全位置で同時に予測を出しています。各位置 t の予測と、実際の次のトークン t+1 を並べました。学習では<strong>この全位置ぶんの誤差</strong>をまとめて使います（第 7 章）。
+            forward は全位置で同時に予測を出しています。各位置 t の予測と、実際の次のトークン t+1 を並べました。学習では<strong>この全位置ぶんの誤差</strong>をまとめて使います（LLM-7）。
           </p>
         </>
       ),
@@ -195,7 +195,6 @@ export function Output(_: { onNavigate: (id: string) => void }) {
 
   return (
     <ChapterLayout
-      num="06"
       title="出力と次トークン"
       lede="残差ストリームの最後の行を、語彙全体の確率分布に変えて 1 つ引く。それを繰り返すのが「生成」です。"
       purpose={

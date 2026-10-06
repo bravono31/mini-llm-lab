@@ -201,7 +201,7 @@ a {
   width: 100%;
   text-align: left;
   display: grid;
-  grid-template-columns: 30px 1fr;
+  grid-template-columns: 48px 1fr;
   align-items: baseline;
   gap: 8px;
   padding: 9px 12px;
@@ -214,6 +214,17 @@ a {
   background: var(--paper-2);
 }
 
+.rail .rail-part {
+  margin: 18px 12px 6px;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: var(--ink-3);
+}
+
+.rail li:first-child .rail-part {
+  margin-top: 0;
+}
+
 .rail button[aria-current='true'] {
   background: var(--paper-2);
   color: var(--ink);
@@ -221,7 +232,7 @@ a {
 
 .rail .num {
   font-family: var(--font-serif);
-  font-size: 15px;
+  font-size: 13px;
   color: var(--ink-3);
   letter-spacing: 0.04em;
 }
@@ -705,6 +716,14 @@ table.data td.num {
   }
   .rail button {
     grid-template-columns: auto auto;
+    white-space: nowrap;
+  }
+  .rail li {
+    display: flex;
+    align-items: center;
+  }
+  .rail .rail-part {
+    margin: 0 4px 0 12px;
     white-space: nowrap;
   }
   .rail .rail-foot {

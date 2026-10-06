@@ -104,7 +104,7 @@ export function Overview({ onNavigate }: ChapterProps) {
     ['層の数', cfg.nLayers, '設計値。仕組みが見える最小の深さ。GPT-2 small は 12 層'],
     ['語彙数', V, `トークナイザの目標値。コーパスの規模から ${V} に設定した。GPT-2 は 50,257`],
     ['文脈長', cfg.ctxLen, '設計値。注意の行列が読める大きさとして 16。GPT-2 は 1,024、最近のモデルは数十万'],
-    ['パラメータ総数', total.toLocaleString(), '上の値から計算で決まる。第 08 章に内訳'],
+    ['パラメータ総数', total.toLocaleString(), '上の値から計算で決まる。LLM-8 に内訳'],
   ]
 
   const steps: Step[] = [
@@ -121,10 +121,10 @@ export function Overview({ onNavigate }: ChapterProps) {
           </p>
           <p>各段の「なぜ」を読めば、次の章以降で見る計算が何のためのものか分かります。段をクリックすると章へ移動します。</p>
           <p>
-            <strong>読む順番について。</strong>実際の LLM は、まず大量の文章で<strong>学習</strong>して重みを決め、そのあとで<strong>生成</strong>に使います。このアプリはあえて逆順で、生成（推論：第 02〜06 章）を先に、学習（第 07 章）を後に置いています。学習の 1 <Term id="step">ステップ</Term>は「生成と同じ計算を 1 回流し、答え合わせをして、重みを少し直す」ことの繰り返しなので、生成側の計算を知らないと学習の章が読めないからです。第 02〜06 章の数値は、同梱の学習済み重み（第 07 章の学習を {lab.pretrained.trainSteps.toLocaleString()} ステップ済ませたもの）で計算しています。
+            <strong>読む順番について。</strong>実際の LLM は、まず大量の文章で<strong>学習</strong>して重みを決め、そのあとで<strong>生成</strong>に使います。このアプリはあえて逆順で、生成（推論：LLM-2〜6）を先に、学習（LLM-7）を後に置いています。学習の 1 <Term id="step">ステップ</Term>は「生成と同じ計算を 1 回流し、答え合わせをして、重みを少し直す」ことの繰り返しなので、生成側の計算を知らないと学習の章が読めないからです。LLM-2〜6 の数値は、同梱の学習済み重み（LLM-7 の学習を {lab.pretrained.trainSteps.toLocaleString()} ステップ済ませたもの）で計算しています。
           </p>
           <p>
-            なお第 07 章の「学習」は、実際の LLM で言う<Term id="pretrain">事前学習</Term>（次のトークンを当てる学習）そのものです。ChatGPT のような対話モデルはこの後に、指示に従わせるための追加の学習（事後学習）を重ねますが、このアプリでは扱いません。
+            なお LLM-7 の「学習」は、実際の LLM で言う<Term id="pretrain">事前学習</Term>（次のトークンを当てる学習）そのものです。ChatGPT のような対話モデルはこの後に、指示に従わせるための追加の学習（事後学習）を重ねますが、このアプリでは扱いません。
           </p>
         </>
       ),
@@ -189,7 +189,6 @@ export function Overview({ onNavigate }: ChapterProps) {
 
   return (
     <ChapterLayout
-      num="01"
       title="概要"
       lede="入力文が次の一語に変わるまでの道のりを、実際の値で並べました。"
       steps={steps}
@@ -254,7 +253,7 @@ export function Overview({ onNavigate }: ChapterProps) {
                     <td>
                       <Tag kind="param" />
                     </td>
-                    <td>埋め込み表、W_qkv、W_o、W₁、W₂、LayerNorm の γ・β。初期値は乱数で、第 07 章の学習で動く。全 {total.toLocaleString()} 個</td>
+                    <td>埋め込み表、W_qkv、W_o、W₁、W₂、LayerNorm の γ・β。初期値は乱数で、LLM-7 の学習で動く。全 {total.toLocaleString()} 個</td>
                   </tr>
                   <tr>
                     <td>

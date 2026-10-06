@@ -82,7 +82,7 @@ export function Params(_: { onNavigate: (id: string) => void }) {
       body: (
         <>
           <p>
-            <strong>{spec.name}</strong>（{spec.label}）の値です。右は同梱の学習済み重みとの差分で、第 7 章で学習を進めるとここが変わります。
+            <strong>{spec.name}</strong>（{spec.label}）の値です。右は同梱の学習済み重みとの差分で、LLM-7 で学習を進めるとここが変わります。
             {session.origin === 'random' && ' いまはランダム初期化なので差分はそのまま「学習済みからの距離」です。'}
           </p>
           <p>
@@ -95,7 +95,6 @@ export function Params(_: { onNavigate: (id: string) => void }) {
 
   return (
     <ChapterLayout
-      num="08"
       title="パラメータ一覧"
       lede="学習で決まる数値のすべて。名前と形と、いまの値。"
       purpose={

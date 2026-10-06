@@ -1,5 +1,5 @@
 import type { ComponentType } from 'react'
-import { CHAPTER_META } from '../chapterMeta'
+import { CHAPTER_META, type ChapterMeta } from '../chapterMeta'
 import { Attention } from './Attention'
 import { Embed } from './Embed'
 import { Mlp } from './Mlp'
@@ -14,10 +14,7 @@ export interface ChapterProps {
   onNavigate: (id: string) => void
 }
 
-export interface ChapterDef {
-  id: string
-  num: string
-  title: string
+export interface ChapterDef extends ChapterMeta {
   component: ComponentType<ChapterProps>
 }
 

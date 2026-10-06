@@ -118,7 +118,6 @@ export function Embed(_: { onNavigate: (id: string) => void }) {
 
   return (
     <ChapterLayout
-      num="03"
       title="埋め込み"
       lede="整数の ID を、意味と位置を持つベクトルに置き換える。ここで初めて「数値」が生まれます。"
       purpose={

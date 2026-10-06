@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { chapterLabel } from '../ui/chapterMeta'
 import { useNav } from '../ui/state/NavProvider'
 
 export interface GlossaryEntry {
@@ -48,9 +49,9 @@ export const GLOSSARY: Record<string, GlossaryEntry> = {
   lr: { term: '学習率', short: '1 回の更新でパラメータをどれだけ動かすかの倍率。大きすぎると発散、小さすぎると遅い。', chapter: 'train' },
   batch: { term: 'バッチ', short: '1 回の更新に使う例のまとまり。ここでは 16 本の長さ 16 の列。', chapter: 'train' },
   step: { term: 'ステップ', short: 'forward → 損失 → 逆伝播 → 更新 の 1 回。同梱の学習済み重みは 3000 ステップ。', chapter: 'train' },
-  pretrain: { term: '事前学習（pretraining）', short: '大量の文章で「次のトークンを当てる」ように重みを決める、LLM の最初の学習段階。第 07 章の学習はこれそのもの。ChatGPT のような対話モデルはこの後に指示に従わせる追加の学習（事後学習：fine-tuning / RLHF）を重ねるが、このアプリでは扱わない。', chapter: 'train' },
+  pretrain: { term: '事前学習（pretraining）', short: '大量の文章で「次のトークンを当てる」ように重みを決める、LLM の最初の学習段階。LLM-7 の学習はこれそのもの。ChatGPT のような対話モデルはこの後に指示に従わせる追加の学習（事後学習：fine-tuning / RLHF）を重ねるが、このアプリでは扱わない。', chapter: 'train' },
   context: { term: '文脈長（context length）', short: 'モデルが一度に見られるトークン数。このモデルは 16。超えた分は捨てる。', chapter: 'overview' },
-  forward: { term: 'forward（順伝播）', short: '入力のトークン列から出力の確率分布まで、第 03〜06 章の計算を一通り流すこと。生成では 1 トークン出すたびに 1 回、学習では 1 ステップに 1 回行う。逆向きに勾配を流すのが backward（逆伝播）。', chapter: 'overview' },
+  forward: { term: 'forward（順伝播）', short: '入力のトークン列から出力の確率分布まで、LLM-3〜6 の計算を一通り流すこと。生成では 1 トークン出すたびに 1 回、学習では 1 ステップに 1 回行う。逆向きに勾配を流すのが backward（逆伝播）。', chapter: 'overview' },
   pca: { term: 'PCA（主成分分析）', short: '高次元のデータを、ばらつきが最も大きい方向に沿って 2 次元に射影する方法。見るためだけの道具でモデルには無関係。', chapter: 'embed' },
   rag: { term: 'RAG（検索拡張生成）', short: 'Retrieval-Augmented Generation。質問に関係する文書を検索し、プロンプトに書き足してから生成させる仕組み。重みを変えずに、モデルが学習していない知識を使わせられる。', chapter: 'rag' },
   tfidf: { term: 'TF-IDF', short: 'トークンの出現回数（TF）に、そのトークンの珍しさ（IDF）を掛けた重み。どの文書にも出る語を軽く、特定の文書にしか出ない語を重く扱う、古典的な検索の手法。', chapter: 'rag' },
@@ -95,7 +96,7 @@ export function GlossaryList({ ids, current }: { ids: string[]; current: string 
               {g.short}
               {link && (
                 <button className="gloss-link" onClick={() => nav.goFrom(g.chapter!, `gloss-${id}`)}>
-                  → {chapterName(g.chapter!)} で詳しく
+                  → {chapterLabel(g.chapter!)}で詳しく
                 </button>
               )}
             </dd>
@@ -106,7 +107,3 @@ export function GlossaryList({ ids, current }: { ids: string[]; current: string 
   )
 }
 
-function chapterName(id: string): string {
-  const names: Record<string, string> = { overview: '第 01 章', tokenize: '第 02 章', embed: '第 03 章', attention: '第 04 章', mlp: '第 05 章', output: '第 06 章', train: '第 07 章', params: '第 08 章', rag: '第 09 章' }
-  return names[id] ?? id
-}

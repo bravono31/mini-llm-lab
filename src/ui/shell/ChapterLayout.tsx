@@ -5,7 +5,6 @@ import { useNav } from '../state/NavProvider'
 import { useStepper, type Step } from '../state/useStepper'
 
 interface Props {
-  num: string
   title: string
   lede: ReactNode
   steps: Step[]
@@ -20,7 +19,7 @@ interface Props {
   children: (step: Step, index: number) => ReactNode
 }
 
-export function ChapterLayout({ num, title, lede, steps, aside, purpose, io, terms, children }: Props) {
+export function ChapterLayout({ title, lede, steps, aside, purpose, io, terms, children }: Props) {
   const nav = useNav()
   const idx = CHAPTER_META.findIndex((c) => c.id === nav.current)
   const nextChapter = idx >= 0 && idx < CHAPTER_META.length - 1 ? CHAPTER_META[idx + 1] : null
@@ -80,7 +79,7 @@ export function ChapterLayout({ num, title, lede, steps, aside, purpose, io, ter
           </button>
         )}
         <header className="stage-head">
-          <div className="chapter-num">CHAPTER {num}</div>
+          <div className="chapter-num">{CHAPTER_META[idx]?.num}</div>
           <h2>{title}</h2>
           <p className="lede">{lede}</p>
           {(purpose || io) && (
@@ -154,7 +153,7 @@ export function ChapterLayout({ num, title, lede, steps, aside, purpose, io, ter
           </div>
           <div className="controls-row controls-sub">
             <span className="muted small">
-              {atEnd && nextChapter ? `▶▶ で第 ${nextChapter.num} 章「${nextChapter.title}」へ` : atStart && prevChapter ? `◀◀ で第 ${prevChapter.num} 章「${prevChapter.title}」の最後へ` : '← → キーでも移動'}
+              {atEnd && nextChapter ? `▶▶ で ${chapterLabel(nextChapter.id)}へ` : atStart && prevChapter ? `◀◀ で ${chapterLabel(prevChapter.id)}の最後へ` : '← → キーでも移動'}
             </span>
           </div>
         </div>

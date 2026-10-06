@@ -155,7 +155,6 @@ export function Tokenize(_: { onNavigate: (id: string) => void }) {
 
   return (
     <ChapterLayout
-      num="02"
       title="トークン化"
       lede="文をモデルが扱える整数の列に変える。語彙は、コーパスから BPE で育てます。"
       purpose={

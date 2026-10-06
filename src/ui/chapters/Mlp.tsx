@@ -174,7 +174,6 @@ export function Mlp(_: { onNavigate: (id: string) => void }) {
 
   return (
     <ChapterLayout
-      num="05"
       title="MLP と残差ストリーム"
       lede="注意機構が集めた情報を、位置ごとに変換して残差ストリームへ書き足す。"
       purpose={

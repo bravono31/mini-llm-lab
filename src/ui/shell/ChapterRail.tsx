@@ -1,3 +1,4 @@
+import { PART_TITLES } from '../chapterMeta'
 import type { ChapterDef } from '../chapters'
 import { useLab } from '../state/LabProvider'
 import { totalSize } from '../../engine/params'
@@ -14,8 +15,9 @@ export function ChapterRail({ chapters, current, onSelect }: Props) {
   return (
     <nav className="rail" aria-label="章">
       <ol>
-        {chapters.map((c) => (
+        {chapters.map((c, i) => (
           <li key={c.id}>
+            {c.part !== chapters[i - 1]?.part && <div className="rail-part">{PART_TITLES[c.part]}</div>}
             <button aria-current={c.id === current} onClick={() => onSelect(c.id)}>
               <span className="num">{c.num}</span>
               <span>{c.title}</span>

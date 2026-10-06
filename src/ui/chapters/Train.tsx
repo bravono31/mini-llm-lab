@@ -253,7 +253,6 @@ export function Train(_: { onNavigate: (id: string) => void }) {
 
   return (
     <ChapterLayout
-      num="07"
       title="学習"
       lede="正解との誤差を損失にし、勾配を逆向きに流して、重みを少し動かす。それを何千回も繰り返します。"
       purpose={
